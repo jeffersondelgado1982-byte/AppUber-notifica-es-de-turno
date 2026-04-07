@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#f5f7fa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meu Uber">
+<title>Meu Uber — Controle por Turno</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface2:#f0f2f6; --surface3:#e8ecf2;
+  --border:#dde2ea; --border2:#c8d0dc;
+  --text:#1a2035; --text2:#4a5568; --muted:#8896aa;
+  --blue:#2563eb; --blue-l:#eff6ff; --blue-b:#bfdbfe;
+  --orange:#f97316; --orange-l:#fff7ed; --orange-b:#fed7aa;
+  --yellow:#eab308; --yellow-l:#fefce8; --yellow-b:#fef08a;
+  --green:#16a34a; --green-l:#f0fdf4; --green-b:#bbf7d0;
+  --red:#dc2626; --red-l:#fef2f2; --red-b:#fecaca;
+  --purple:#7c3aed; --purple-l:#f5f3ff; --purple-b:#ddd6fe;
+  --uber:#000000; --n99:#f5a623;
+  --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  --radius:14px; --radius-sm:10px; --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100dvh;max-width:480px;margin:0 auto;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.header{
+  background:var(--surface);padding:14px 16px 10px;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 1px 0 var(--border),0 2px 8px rgba(0,0,0,0.04);
+}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;background:linear-gradient(135deg,var(--blue),#1d4ed8);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 2px 6px rgba(37,99,235,0.3)}
+.header-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px}
+.header-sub{font-size:10px;color:var(--muted);font-weight:500;margin-top:0px}
+.header-right{display:flex;align-items:center;gap:6px}
+.hbtn{background:var(--surface2);border:none;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:14px;color:var(--text2);transition:background 0.15s}
+.hbtn:active{background:var(--surface3)}
+.clock{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-l);padding:5px 9px;border-radius:8px;border:1px solid var(--blue-b)}
+
+/* ── CONTENT ── */
+.content{padding:14px 14px 24px}
+.page{display:none}.page.active{display:block}
+
+/* ── SECTION LABEL ── */
+.sec{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec:first-child{margin-top:0}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:11px;box-shadow:var(--shadow)}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.card-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,#1e40af,#2563eb,#3b82f6);
+  border-radius:var(--radius);padding:18px;margin-bottom:11px;
+  color:#fff;box-shadow:0 4px 20px rgba(37,99,235,0.35),0 1px 4px rgba(37,99,235,0.2);
+  position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.07);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-20px;left:-10px;width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:50%}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;position:relative;z-index:1}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;opacity:0.75;margin-bottom:4px}
+.hero-val{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
+.hero-sub{font-size:11px;opacity:0.7;margin-top:3px}
+.hero-right{text-align:right}
+.hero-right .hero-val{font-size:20px;color:#fbbf24}
+.hero-bar-wrap{position:relative;z-index:1}
+.hero-bar-track{height:8px;background:rgba(255,255,255,0.2);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.hero-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#fbbf24,#f59e0b);transition:width 0.7s cubic-bezier(.4,0,.2,1)}
+.hero-bar-fill.done{background:linear-gradient(90deg,#4ade80,#22c55e)}
+.hero-bar-labels{display:flex;justify-content:space-between;font-size:10px;opacity:0.75;font-weight:600}
+
+/* ── TURNO SELECTOR ── */
+.turno-sel-wrap{display:flex;gap:8px;margin-bottom:12px}
+.turno-sel-btn{flex:1;padding:11px 6px;border-radius:var(--radius-sm);border:2px solid var(--border);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:0.3px;transition:all 0.18s;background:var(--surface2);color:var(--muted);text-align:center;user-select:none}
+.turno-sel-btn.manha.on{background:var(--yellow-l);border-color:#ca8a04;color:#92400e;box-shadow:0 2px 8px rgba(234,179,8,0.3)}
+.turno-sel-btn.tarde.on{background:var(--orange-l);border-color:var(--orange);color:#9a3412;box-shadow:0 2px 8px rgba(249,115,22,0.3)}
+.turno-sel-btn.noite.on{background:var(--purple-l);border-color:#6d28d9;color:#5b21b6;box-shadow:0 2px 8px rgba(124,58,237,0.3)}
+
+/* ── TURNO INPUT CARD ── */
+.turno-input-card{border-radius:var(--radius);padding:14px;margin-bottom:11px;box-shadow:var(--shadow)}
+.turno-input-card.manha{background:linear-gradient(135deg,var(--yellow-l),#fef9c3);border:1.5px solid var(--yellow-b)}
+.turno-input-card.tarde{background:linear-gradient(135deg,var(--orange-l),#ffedd5);border:1.5px solid var(--orange-b)}
+.turno-input-card.noite{background:linear-gradient(135deg,var(--purple-l),#ede9fe);border:1.5px solid var(--purple-b)}
+.turno-input-title{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.turno-input-title.manha{color:#92400e}
+.turno-input-title.tarde{color:#9a3412}
+.turno-input-title.noite{color:#5b21b6}
+
+/* ── VALOR INPUT grande ── */
+.valor-input-wrap{margin-bottom:12px}
+.valor-input-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block}
+.valor-input{
+  width:100%;background:var(--surface);border:2px solid var(--border2);
+  border-radius:var(--radius-sm);color:var(--text);
+  font-family:var(--mono);font-size:26px;font-weight:700;
+  padding:13px 14px;outline:none;
+  transition:border-color 0.18s,box-shadow 0.18s;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,0.04);
+}
+.valor-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,0.12)}
+.valor-input::placeholder{color:var(--muted);font-size:14px;font-weight:400;font-family:var(--font)}
+.valor-input.manha:focus{border-color:#ca8a04;box-shadow:0 0 0 3px rgba(234,179,8,0.15)}
+.valor-input.tarde:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.15)}
+.valor-input.noite:focus{border-color:#6d28d9;box-shadow:0 0 0 3px rgba(124,58,237,0.15)}
+
+/* ── TURNO CARDS (resumo) ── */
+.turno-card{border-radius:var(--radius-sm);padding:13px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.turno-card.manha{background:var(--surface);border:1px solid var(--yellow-b);border-left:4px solid #ca8a04}
+.turno-card.tarde{background:var(--surface);border:1px solid var(--orange-b);border-left:4px solid var(--orange)}
+.turno-card.noite{background:var(--surface);border:1px solid var(--purple-b);border-left:4px solid #7c3aed}
+.turno-card.empty{border-left-color:var(--border);opacity:0.55}
+.turno-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.turno-name{font-size:12px;font-weight:700;color:var(--text2)}
+.turno-total{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--blue)}
+.turno-total.empty{color:var(--muted)}
+.turno-sub{font-size:10px;color:var(--muted);margin-bottom:7px}
+.turno-meta-row{display:flex;gap:6px;flex-wrap:wrap}
+.tmeta{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--text2);font-weight:600;display:flex;align-items:center;gap:4px}
+.tmeta .sv2{font-family:var(--mono);font-weight:700;color:var(--text)}
+.turno-edit-btn{background:none;border:1px solid var(--border2);border-radius:6px;font-size:10px;font-weight:700;color:var(--muted);padding:3px 9px;cursor:pointer;transition:all 0.15s}
+.turno-edit-btn:active{background:var(--surface2)}
+.turno-del-btn{background:none;border:1px solid var(--red-b);border-radius:6px;font-size:10px;font-weight:700;color:var(--red);padding:3px 9px;cursor:pointer;transition:all 0.15s;margin-left:4px}
+
+/* ── CHECKPOINTS ── */
+.cp-card{background:linear-gradient(135deg,var(--blue-l),#e0effe);border:1px solid var(--blue-b);border-radius:var(--radius);padding:13px;margin-bottom:11px}
+.cp-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cp-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--blue-b);font-size:12px;color:var(--text2);font-weight:500}
+.cp-row:last-child{border-bottom:none}
+.cp-val{font-family:var(--mono);font-size:13px;font-weight:700}
+.cp-val.pos{color:var(--green)}
+.cp-val.neg{color:var(--red)}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;box-shadow:var(--shadow)}
+.kpi-icon{font-size:18px;margin-bottom:5px}
+.kpi-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.kpi-val{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)}
+.kpi-val.blue{color:var(--blue)}.kpi-val.orange{color:var(--orange)}.kpi-val.green{color:var(--green)}.kpi-val.red{color:var(--red)}.kpi-val.yellow{color:var(--yellow)}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* ── STAT ROWS ── */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);font-weight:500}
+.stat-row:last-child{border-bottom:none}
+.sv{font-family:var(--mono);font-weight:700;color:var(--text)}
+.sv.blue{color:var(--blue)}.sv.orange{color:var(--orange)}.sv.green{color:var(--green)}.sv.red{color:var(--red)}.sv.yellow{color:var(--yellow)}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:12px}
+.form-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block}
+.form-input{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:14px;padding:11px 13px;outline:none;transition:border-color 0.18s,box-shadow 0.18s;font-weight:500}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+input[type=date].form-input{color:var(--text)}
+input[type=time].form-input{color:var(--text);width:auto;padding:8px 10px;font-size:13px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.warn-box{background:var(--yellow-l);border:1px solid var(--yellow-b);border-radius:var(--radius-sm);padding:9px 12px;font-size:11px;color:#92400e;margin-bottom:11px;display:none;font-weight:500}
+.warn-box.show{display:block}
+
+/* ── RESULTADO CUSTOS ── */
+.res-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-top:12px;display:none}
+.res-box.show{display:block}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);font-weight:500}
+.res-row:last-child{border-bottom:none;padding-bottom:0}
+.res-val{font-family:var(--mono);font-weight:700}
+.res-val.neg{color:var(--red)}.res-val.pos{color:var(--green)}
+
+/* ── BUTTONS ── */
+.btn{width:100%;border:none;border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;font-weight:700;padding:13px;cursor:pointer;letter-spacing:0.3px;transition:transform 0.1s,box-shadow 0.15s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(0.98)}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.3)}
+.btn-blue:active{box-shadow:0 1px 4px rgba(37,99,235,0.2)}
+.btn-orange{background:linear-gradient(135deg,var(--orange),#ea6c00);color:#fff;box-shadow:0 2px 8px rgba(249,115,22,0.3)}
+.btn-green{background:var(--green-l);color:var(--green);border:1.5px solid var(--green-b)}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border)}
+.btn-danger{background:var(--red-l);color:var(--red);border:1px solid var(--red-b);margin-top:7px}
+.btn-dashed{background:var(--surface2);border:1.5px dashed var(--border2);border-radius:var(--radius-sm);color:var(--muted);font-size:13px;font-weight:600;padding:10px;width:100%;cursor:pointer;margin-bottom:8px;transition:all 0.18s;text-align:center;font-family:var(--font)}
+.btn-dashed:active{border-color:var(--blue);color:var(--blue)}
+.btn-manha{background:linear-gradient(135deg,#fef08a,#fde047);color:#92400e;border:none;box-shadow:0 2px 8px rgba(234,179,8,0.3)}
+.btn-tarde{background:linear-gradient(135deg,var(--orange),#ea6c00);color:#fff;border:none;box-shadow:0 2px 8px rgba(249,115,22,0.3)}
+.btn-noite{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;box-shadow:0 2px 8px rgba(124,58,237,0.3)}
+
+/* ── DESPESAS ── */
+.desp-item{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.desp-desc{font-size:13px;color:var(--text);flex:1;font-weight:500}
+.desp-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red);margin-left:10px}
+.desp-del{color:var(--muted);cursor:pointer;font-size:16px;margin-left:8px;line-height:1;padding:2px}
+.desp-del:active{color:var(--red)}
+.empty-msg{text-align:center;color:var(--muted);font-size:12px;padding:20px 0;font-weight:500}
+
+/* ── ABASTECIMENTO ── */
+.abast-info{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:11px}
+.abast-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);font-weight:500}
+.abast-row:last-child{border-bottom:none}
+.abast-row .sv{font-size:13px}
+.comb-row{display:flex;gap:8px;margin-bottom:12px}
+.comb-btn{flex:1;padding:10px 4px;border-radius:var(--radius-sm);border:1.5px solid var(--border2);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:700;transition:all 0.18s;background:var(--surface2);color:var(--muted);text-align:center}
+.comb-btn.on{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.abast-hist-item{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.abast-hist-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.abast-hist-posto{font-size:13px;font-weight:700;color:var(--text)}
+.abast-hist-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange)}
+.abast-hist-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:2px 0;font-weight:500}
+
+/* ── DASHBOARD / ANÁLISE ── */
+.tab-switcher{display:flex;background:var(--surface2);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px;gap:2px;border:1px solid var(--border)}
+.tab-sw-btn{flex:1;padding:8px 4px;border-radius:8px;border:none;background:none;font-family:var(--font);font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.18s;letter-spacing:0.3px}
+.tab-sw-btn.on{background:var(--surface);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+
+/* Gauge */
+.gauge-wrap{display:flex;align-items:center;gap:16px}
+.gauge-info .gauge-pct{font-family:var(--mono);font-size:36px;font-weight:900;color:var(--blue);line-height:1;letter-spacing:-2px}
+.gauge-info .gauge-sub{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500}
+.gauge-info .gauge-falta{font-size:11px;color:var(--orange);margin-top:3px;font-weight:600}
+
+/* Chart day rows */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.chart-head{padding:10px 12px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.chart-head-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.day-row{padding:8px 12px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:26px 1fr 72px;gap:8px;align-items:center}
+.day-row:last-child{border-bottom:none}
+.day-row.today{background:var(--blue-l)}
+.day-num{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:700}
+.day-bars{display:flex;flex-direction:column;gap:3px}
+.bar-wrap{display:flex;align-items:center;gap:4px}
+.bar{height:7px;border-radius:3px;min-width:2px;transition:width 0.5s ease}
+.bar.g{background:var(--blue)}
+.bar.c{background:var(--red)}
+.bar-val{font-family:var(--mono);font-size:9px;color:var(--muted);min-width:36px}
+.day-lucro{font-family:var(--mono);font-size:11px;font-weight:700;text-align:right}
+.day-lucro.pos{color:var(--green)}.day-lucro.neg{color:var(--red)}.day-lucro.zero{color:var(--muted)}
+
+/* Hist log */
+.log-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.log-day-head{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.log-day-date{font-size:11px;font-weight:700;color:var(--text2)}
+.log-day-total{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--blue)}
+.log-row{display:flex;justify-content:space-between;padding:6px 12px;font-size:11px;color:var(--text2);border-bottom:1px solid var(--border);font-weight:500}
+.log-row:last-child{border-bottom:none}
+.log-row .sv{color:var(--text)}
+.log-empty{text-align:center;color:var(--muted);font-size:12px;padding:24px 0;font-weight:500}
+
+/* Plat bars */
+.plat-bar-item{margin-bottom:10px}
+.plat-bar-label{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px}
+.plat-bar-track{height:9px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.plat-bar-fill{height:100%;border-radius:4px;transition:width 0.7s ease}
+.plat-bar-fill.manha{background:linear-gradient(90deg,#eab308,#ca8a04)}
+.plat-bar-fill.tarde{background:linear-gradient(90deg,#f97316,#ea580c)}
+.plat-bar-fill.noite{background:linear-gradient(90deg,#7c3aed,#6d28d9)}
+
+/* Conselheiro */
+.conselheiro{background:linear-gradient(135deg,var(--blue-l),#dbeafe);border:1px solid var(--blue-b);border-radius:var(--radius);padding:14px;margin-bottom:11px}
+.conselheiro-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.conselheiro-msg{font-size:13px;color:#1e3a6e;line-height:1.7;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--blue-b);font-weight:500}
+.conselheiro-msg:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+
+/* Metas */
+.meta-box{background:linear-gradient(135deg,var(--orange-l),#fff7ed);border:1px solid var(--orange-b);border-radius:var(--radius);padding:14px;margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+.meta-box-label{font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.meta-box-val{font-family:var(--mono);font-size:20px;font-weight:800;color:var(--orange)}
+.meta-box-sub{font-size:10px;color:var(--muted);margin-top:3px;font-weight:500}
+.gf-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:7px;display:flex;gap:8px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.gf-item input{background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:13px;font-weight:500}
+.gf-item input.gf-desc{flex:1}
+.gf-item input.gf-val{width:80px;font-family:var(--mono);font-weight:700;text-align:right;color:var(--orange)}
+.gf-del{color:var(--muted);cursor:pointer;font-size:16px;flex-shrink:0;padding:2px}
+.gf-del:active{color:var(--red)}
+
+/* Config */
+.cfg-turno-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px}
+.cfg-turno-row{display:flex;align-items:center;padding:11px 12px;border-bottom:1px solid var(--border);gap:8px}
+.cfg-turno-row:last-child{border-bottom:none}
+.cfg-turno-name{font-size:12px;font-weight:700;min-width:64px;color:var(--text2)}
+.cfg-turno-inputs{display:flex;gap:5px;flex:1;align-items:center}
+.hora-sep{color:var(--muted);font-size:11px}
+.backup-row{display:flex;flex-direction:column;gap:7px}
+
+/* Notif banner */
+.notif-banner{background:linear-gradient(135deg,var(--orange-l),#fff7ed);border:1px solid var(--orange-b);border-radius:var(--radius);padding:11px 14px;margin-bottom:11px;display:none;align-items:center;justify-content:space-between;gap:10px}
+.notif-banner.show{display:flex}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--text);color:#fff;font-size:12px;font-weight:700;padding:9px 18px;border-radius:20px;z-index:9999;opacity:0;transition:opacity 0.22s,transform 0.22s;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--green)}
+.toast.err{background:var(--red)}
+.toast.info{background:var(--blue)}
+
+/* ── CONFETTI ── */
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100dvh) rotate(720deg);opacity:0}}
+.confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;animation:fall 2s ease-in forwards;pointer-events:none;z-index:9999}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── EDGE SIDEBAR ── */
+.edge-handle{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  width:14px;height:72px;
+  background:var(--blue);
+  border-radius:12px 0 0 12px;
+  z-index:300;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:-3px 0 16px rgba(37,99,235,0.35);
+  transition:width 0.18s,background 0.18s;
+}
+.edge-handle:active{background:#1d4ed8}
+.edge-handle-grip{display:flex;flex-direction:column;gap:3px;align-items:center}
+.edge-handle-grip span{display:block;width:2.5px;height:2.5px;border-radius:50%;background:rgba(255,255,255,0.8)}
+.edge-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:280;pointer-events:none;transition:background 0.3s}
+.edge-overlay.show{background:rgba(15,23,42,0.35);pointer-events:all}
+.edge-panel{
+  position:fixed;right:0;top:0;bottom:0;width:76px;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  z-index:290;
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 0 16px;gap:2px;
+  overflow-y:auto;overflow-x:hidden;
+  transform:translateX(100%);
+  transition:transform 0.3s cubic-bezier(.32,.72,0,1),box-shadow 0.3s;
+}
+.edge-panel::-webkit-scrollbar{width:0}
+.edge-panel.open{transform:translateX(0);box-shadow:-8px 0 40px rgba(0,0,0,0.15)}
+.edge-tab{
+  width:62px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:10px 4px;border-radius:12px;
+  cursor:pointer;color:var(--muted);font-size:8.5px;font-weight:700;
+  letter-spacing:0.3px;text-transform:uppercase;
+  border:none;background:none;
+  transition:color 0.18s,background 0.18s;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+}
+.edge-tab svg{transition:transform 0.18s;flex-shrink:0}
+.edge-tab.active{color:var(--blue);background:var(--blue-l)}
+.edge-tab.active svg{transform:scale(1.15)}
+.edge-tab:not(.active):active{background:var(--surface2)}
+.edge-tab.dragging{opacity:0.35;background:var(--surface2)}
+.edge-sep{width:42px;height:1px;background:var(--border);margin:4px auto;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🚗</div>
+    <div>
+      <div class="header-title">Meu Uber</div>
+      <div class="header-sub" id="header-sub">Registro por turno</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="hbtn" id="sound-btn" onclick="toggleSound()" title="Sons">🔊</button>
+    <button class="hbtn" id="notif-btn" onclick="toggleNotifications()" title="Notificações">🔔</button>
+    <div class="clock" id="clock">--:--</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════════
+     ABA 1 — HOJE
+══════════════════════════════════ -->
+<div class="page active" id="page-hoje">
+
+  <div class="notif-banner" id="notif-banner">
+    <div style="font-size:12px;color:#92400e;flex:1;font-weight:500"><strong>Ative as notificações</strong> para receber alertas de meta</div>
+    <button onclick="requestNotifPermission()" style="background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;padding:7px 12px;cursor:pointer">Ativar</button>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-label">Ganho hoje</div>
+        <div class="hero-val" id="ganho-hoje">R$ 0,00</div>
+        <div class="hero-sub" id="hero-turnos-feitos">0 turnos registrados</div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-label">Falta pra meta</div>
+        <div class="hero-val" id="falta-val">R$ 300,00</div>
+        <div class="hero-sub" id="falta-horas">~8,8h</div>
+      </div>
+    </div>
+    <div class="hero-bar-wrap">
+      <div class="hero-bar-track"><div class="hero-bar-fill" id="hero-bar" style="width:0%"></div></div>
+      <div class="hero-bar-labels">
+        <span id="hero-pct">0% da meta diária</span>
+        <span id="hero-meta">R$ 300,00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKPOINTS -->
+  <div class="cp-card" id="cp-card" style="display:none">
+    <div class="cp-title">📍 Checkpoints de turno</div>
+    <div id="cp-rows"></div>
+  </div>
+
+  <!-- REGISTRAR TURNO -->
+  <div class="sec">Registrar turno</div>
+
+  <!-- Seletor de turno -->
+  <div class="turno-sel-wrap">
+    <button class="turno-sel-btn manha on" id="tsel-manha" onclick="selectTurnoInput('manha')">☀️ Manhã</button>
+    <button class="turno-sel-btn tarde" id="tsel-tarde" onclick="selectTurnoInput('tarde')">🌤️ Tarde</button>
+    <button class="turno-sel-btn noite" id="tsel-noite" onclick="selectTurnoInput('noite')">🌙 Noite</button>
+  </div>
+
+  <!-- Card de input do turno selecionado -->
+  <div class="turno-input-card manha" id="turno-input-card">
+    <div class="turno-input-title manha" id="turno-input-title">☀️ TURNO MANHÃ</div>
+
+    <div class="valor-input-wrap">
+      <label class="valor-input-label">Valor ganho no turno (R$)</label>
+      <input type="text" inputmode="numeric" class="valor-input manha" id="turno-valor-input" placeholder="Valor do turno">
+    </div>
+
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">KM Inicial</label>
+        <input type="number" inputmode="decimal" class="form-input" id="turno-km-ini" placeholder="10000">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">KM Final</label>
+        <input type="number" inputmode="decimal" class="form-input" id="turno-km-fim" placeholder="10150">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label">Horas trabalhadas no turno</label>
+      <input type="number" inputmode="decimal" class="form-input" id="turno-horas" placeholder="Ex: 4.5">
+    </div>
+
+    <button class="btn btn-manha" id="turno-save-btn" onclick="salvarTurno()">💾 Salvar Turno Manhã</button>
+  </div>
+
+  <!-- Resumo dos 3 turnos -->
+  <div class="sec">Turnos do dia</div>
+  <div id="turnos-resumo-container"></div>
+
+</div><!-- fim page-hoje -->
+
+
+<!-- ══════════════════════════════════
+     ABA 2 — FINANÇAS
+══════════════════════════════════ -->
+<div class="page" id="page-financas">
+
+  <div class="tab-switcher">
+    <button class="tab-sw-btn on" id="sw-custos" onclick="swFin('custos')">⛽ Custos do Dia</button>
+    <button class="tab-sw-btn" id="sw-despesas" onclick="swFin('despesas')">💸 Despesas</button>
+  </div>
+
+  <!-- CUSTOS -->
+  <div id="fin-custos">
+    <div class="card">
+      <div class="card-title">Data de Referência</div>
+      <div class="form-group">
+        <input type="date" class="form-input" id="custos-date" style="width:100%">
+      </div>
+      <div class="warn-box" id="custos-warn">⚠️ Modificando histórico de data anterior</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Dados do Dia (combustível)</div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Preço comb. (R$/L)</label>
+          <input type="number" inputmode="decimal" class="form-input" id="preco-comb" placeholder="5.80">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Autonomia (KM/L)</label>
+          <input type="number" inputmode="decimal" class="form-input" id="autonomia" placeholder="12">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="form-label">Gastos extras do dia (R$)</label>
+        <input type="number" inputmode="decimal" class="form-input" id="gastos-extras" placeholder="0.00">
+      </div>
+      <div class="card" style="background:var(--blue-l);border-color:var(--blue-b);margin-bottom:0;padding:10px 12px">
+        <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:8px;letter-spacing:1px">📊 KM E HORAS DOS TURNOS (auto-calculado)</div>
+        <div id="custos-turnos-preview" style="font-size:11px;color:var(--text2)">Registre os turnos na aba Hoje para ver aqui.</div>
+      </div>
+    </div>
+    <button class="btn btn-blue" onclick="calcularCustos()">⚡ Calcular e Salvar</button>
+    <div class="res-box" id="resultado-custos">
+      <div class="res-row"><span>Total KM rodados</span><span class="res-val" id="res-km">--</span></div>
+      <div class="res-row"><span>Total horas trabalhadas</span><span class="res-val" id="res-horas">--</span></div>
+      <div class="res-row"><span>Litros gastos</span><span class="res-val" id="res-litros">--</span></div>
+      <div class="res-row"><span>Custo combustível</span><span class="res-val neg" id="res-comb">--</span></div>
+      <div class="res-row"><span>Gastos extras</span><span class="res-val neg" id="res-extras">--</span></div>
+      <div class="res-row" style="font-weight:700"><span>Custo total</span><span class="res-val neg" id="res-total">--</span></div>
+      <div class="res-row" style="font-weight:800;font-size:13px"><span>💰 Lucro líquido</span><span class="res-val" id="res-liquido">--</span></div>
+    </div>
+  </div>
+
+  <!-- DESPESAS -->
+  <div id="fin-despesas" style="display:none">
+    <div class="card">
+      <div class="card-title">Nova Despesa — Hoje</div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <input type="text" class="form-input" id="desp-desc" placeholder="Ex: Almoço, estacionamento...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Valor (R$)</label>
+        <input type="text" inputmode="numeric" class="form-input" id="desp-val-input" placeholder="0,00" maxlength="10">
+      </div>
+      <button class="btn btn-orange" onclick="addDespesa()">+ Adicionar Despesa</button>
+    </div>
+    <div class="card" id="desp-resumo">
+      <div class="stat-row"><span>Total despesas hoje</span><span class="sv red" id="desp-total-hoje">R$ 0,00</span></div>
+      <div class="stat-row"><span>Ganhos brutos hoje</span><span class="sv blue" id="desp-ganhos-hoje">R$ 0,00</span></div>
+      <div class="stat-row" style="font-weight:700"><span>💰 Líquido após despesas</span><span class="sv" id="desp-liquido-hoje">R$ 0,00</span></div>
+    </div>
+    <div class="sec">Despesas de hoje</div>
+    <div id="despesas-hoje-list"></div>
+    <div class="sec" style="margin-top:16px">Histórico</div>
+    <div id="despesas-hist-list"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     ABA 3 — VEÍCULO
+══════════════════════════════════ -->
+<div class="page" id="page-veiculo">
+
+  <div id="abast-entre-info" class="abast-info" style="display:none">
+    <div class="card-title" style="margin-bottom:8px">⛽ Entre Abastecimentos</div>
+    <div class="abast-row"><span>KM rodados</span><span class="sv blue" id="abast-km-entre">--</span></div>
+    <div class="abast-row"><span>Litros estimados</span><span class="sv" id="abast-litros-entre">--</span></div>
+    <div class="abast-row"><span>Custo estimado</span><span class="sv red" id="abast-custo-entre">--</span></div>
+  </div>
+  <div id="abast-primeiro-aviso" class="card" style="text-align:center;color:var(--muted);font-size:12px;padding:18px;display:none;font-weight:500">
+    ⏳ Registre mais um abastecimento para ver a diferença entre eles.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Novo Abastecimento</div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Posto</label>
+        <input type="text" class="form-input" id="abast-posto" placeholder="Nome do posto">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">KM atual</label>
+        <input type="number" inputmode="decimal" class="form-input" id="abast-km" placeholder="52400">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Combustível</label>
+      <div class="comb-row">
+        <button class="comb-btn on" id="comb-gasolina" onclick="selectComb('gasolina')">⛽ Gasolina</button>
+        <button class="comb-btn" id="comb-etanol" onclick="selectComb('etanol')">🌿 Etanol</button>
+        <button class="comb-btn" id="comb-gnv" onclick="selectComb('gnv')">💨 GNV</button>
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Valor pago (R$)</label>
+        <input type="number" inputmode="decimal" class="form-input" id="abast-valor" placeholder="100.00">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Autonomia Álcool (KM/L)</label>
+        <input type="number" inputmode="decimal" class="form-input" id="abast-autonomia-eta" placeholder="8">
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Autonomia Gasolina (KM/L)</label>
+        <input type="number" inputmode="decimal" class="form-input" id="abast-autonomia-gas" placeholder="12">
+      </div>
+      <div class="form-group" style="margin-bottom:0"><!-- reservado --></div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">R$/L Gasolina</label>
+        <input type="number" inputmode="decimal" class="form-input" id="abast-preco-gas" placeholder="5.80">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">R$/L Etanol</label>
+        <input type="number" inputmode="decimal" class="form-input" id="abast-preco-eta" placeholder="3.90">
+      </div>
+    </div>
+    <div class="abast-info" id="abast-calc-box" style="margin-bottom:12px">
+      <div class="abast-row"><span>Litros abastecidos</span><span class="sv" id="abast-litros-calc">--</span></div>
+      <div class="abast-row"><span>Alcance c/ combustível atual</span><span class="sv green" id="abast-alcance-calc">--</span></div>
+      <div class="abast-row"><span>🏆 Melhor combustível</span><span class="sv orange" id="abast-vantagem">Informe os preços e autonomias</span></div>
+      <div class="abast-row" id="abast-comparativo-row" style="display:none"><span id="abast-comp-label">Comparativo</span><span class="sv" id="abast-comp-val">--</span></div>
+    </div>
+    <button class="btn btn-blue" onclick="salvarAbastecimento()">💾 Salvar Abastecimento</button>
+  </div>
+
+  <div class="sec">Histórico de abastecimentos</div>
+  <div id="abast-hist-list"></div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     ABA 4 — ANÁLISE
+══════════════════════════════════ -->
+<div class="page" id="page-analise">
+
+  <div class="tab-switcher">
+    <button class="tab-sw-btn on" id="sw-dash" onclick="swAnalise('dash')">📊 Dash</button>
+    <button class="tab-sw-btn" id="sw-mensal" onclick="swAnalise('mensal')">📅 Mensal</button>
+    <button class="tab-sw-btn" id="sw-hist" onclick="swAnalise('hist')">📋 Histórico</button>
+    <button class="tab-sw-btn" id="sw-perf" onclick="swAnalise('perf')">⚡ Perf.</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="an-dash">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-icon">💰</div><div class="kpi-label">Bruto mensal</div><div class="kpi-val blue" id="dash-bruto">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-icon">📈</div><div class="kpi-label">Lucro líquido</div><div class="kpi-val green" id="dash-lucro">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-icon">📅</div><div class="kpi-label">Dias trabalhados</div><div class="kpi-val orange" id="dash-dias">0</div></div>
+      <div class="kpi"><div class="kpi-icon">🕐</div><div class="kpi-label">Total horas</div><div class="kpi-val yellow" id="dash-horas">0h</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Meta Mensal</div>
+      <div class="gauge-wrap">
+        <canvas id="gauge-canvas" width="100" height="100" style="flex-shrink:0"></canvas>
+        <div class="gauge-info">
+          <div class="gauge-pct" id="gauge-pct">0%</div>
+          <div class="gauge-sub" id="gauge-sub">R$ 0 de R$ 0</div>
+          <div class="gauge-falta" id="gauge-falta"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ganhos do mês — dia a dia</div>
+      <canvas id="line-canvas" style="width:100%;height:130px"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Rendimento por turno — mês</div>
+      <div id="dash-turnos-bars"></div>
+    </div>
+    <div class="kpi-grid" style="margin-bottom:0">
+      <div class="kpi"><div class="kpi-icon">🏆</div><div class="kpi-label">Melhor dia</div><div class="kpi-val orange" id="dash-best-val">R$ 0</div><div class="kpi-sub" id="dash-best-date">—</div></div>
+      <div class="kpi"><div class="kpi-icon">📊</div><div class="kpi-label">Média diária</div><div class="kpi-val blue" id="dash-media-val">R$ 0</div><div class="kpi-sub" id="dash-media-sub">—</div></div>
+      <div class="kpi"><div class="kpi-icon">⭐</div><div class="kpi-label">Turno top</div><div class="kpi-val yellow" id="dash-turno-top">—</div><div class="kpi-sub" id="dash-turno-sub">—</div></div>
+      <div class="kpi"><div class="kpi-icon">⏱️</div><div class="kpi-label">R$/hora média</div><div class="kpi-val green" id="dash-rph">R$ 0</div><div class="kpi-sub" id="dash-rph-sub">—</div></div>
+    </div>
+  </div>
+
+  <!-- MENSAL -->
+  <div id="an-mensal" style="display:none">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Ganhos brutos</div><div class="kpi-val blue" id="men-ganhos">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Custos</div><div class="kpi-val red" id="men-custos">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Lucro</div><div class="kpi-val green" id="men-lucro">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Dias</div><div class="kpi-val orange" id="men-dias">0</div></div>
+      <div class="kpi"><div class="kpi-label">Média/dia</div><div class="kpi-val yellow" id="men-media">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Total horas</div><div class="kpi-val" id="men-horas">0h</div></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">☀️ Manhã</div><div class="kpi-val yellow" id="men-manha">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">🌤️ Tarde</div><div class="kpi-val orange" id="men-tarde">R$ 0</div></div>
+      <div class="kpi" style="grid-column:1/-1"><div class="kpi-label">🌙 Noite</div><div class="kpi-val" style="color:var(--purple)" id="men-noite">R$ 0</div></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:10px;padding:0 2px">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-weight:600"><div style="width:10px;height:10px;border-radius:2px;background:var(--blue)"></div>Ganhos</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-weight:600"><div style="width:10px;height:10px;border-radius:2px;background:var(--red)"></div>Custos</div>
+      <div style="margin-left:auto;font-size:9px;color:var(--muted);font-weight:600">★ = Hoje</div>
+    </div>
+    <div class="chart-wrap" id="mensal-chart"></div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div id="an-hist" style="display:none">
+    <div class="card">
+      <div class="card-title">Hoje vs Ontem</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
+        <div style="background:var(--blue-l);border:1px solid var(--blue-b);border-radius:var(--radius-sm);padding:12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:6px">Hoje</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--blue)" id="hist-hoje">R$ 0</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Ontem</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)" id="hist-ontem">R$ 0</div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:5px 0"><span style="font-size:12px;font-weight:700" id="hist-diff-dia">--</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Por Turno — Hoje</div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;background:var(--yellow-l);border:1px solid var(--yellow-b);border-left:3px solid #ca8a04;border-radius:var(--radius-sm);padding:10px;text-align:center">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;margin-bottom:5px;color:#92400e">☀️ MANHÃ</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:#92400e" id="hist-manha-hoje">R$ 0</div>
+        </div>
+        <div style="flex:1;background:var(--orange-l);border:1px solid var(--orange-b);border-left:3px solid var(--orange);border-radius:var(--radius-sm);padding:10px;text-align:center">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;margin-bottom:5px;color:var(--orange)">🌤️ TARDE</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange)" id="hist-tarde-hoje">R$ 0</div>
+        </div>
+        <div style="flex:1;background:var(--purple-l);border:1px solid var(--purple-b);border-left:3px solid #7c3aed;border-radius:var(--radius-sm);padding:10px;text-align:center">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;margin-bottom:5px;color:#7c3aed">🌙 NOITE</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:#7c3aed" id="hist-noite-hoje">R$ 0</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Resumo do Mês</div>
+      <div class="stat-row"><span>Total ganho</span><span class="sv blue" id="hist-mes-total">R$ 0,00</span></div>
+      <div class="stat-row"><span>Dias trabalhados</span><span class="sv" id="hist-dias">0</span></div>
+      <div class="stat-row"><span>Média por dia</span><span class="sv orange" id="hist-media">R$ 0,00</span></div>
+      <div class="stat-row"><span>Meta mensal</span><span class="sv" id="hist-meta-mensal">R$ 0,00</span></div>
+      <div class="stat-row"><span>% da meta</span><span class="sv green" id="hist-meta-pct">0%</span></div>
+    </div>
+    <div class="sec">Histórico de dias</div>
+    <div id="log-list"></div>
+  </div>
+
+  <!-- PERFORMANCE -->
+  <div id="an-perf" style="display:none">
+    <div class="conselheiro">
+      <div class="conselheiro-title">🤖 Conselheiro</div>
+      <div id="conselheiro-msgs"></div>
+    </div>
+    <div class="sec">Performance de hoje</div>
+    <div class="kpi-grid" id="perf-diaria-grid"></div>
+    <div class="sec">Performance semanal</div>
+    <div class="kpi-grid" id="perf-semanal-grid"></div>
+    <div class="sec">Mensal detalhado</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Bruto mensal</div><div class="kpi-val blue" id="pm-bruto">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Custos mensal</div><div class="kpi-val red" id="pm-custos">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Lucro mensal</div><div class="kpi-val green" id="pm-lucro">R$ 0</div></div>
+      <div class="kpi"><div class="kpi-label">Dias no mês</div><div class="kpi-val orange" id="pm-dias">0</div></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:10px;font-size:10px;color:var(--muted);font-weight:600">
+      <span><span style="display:inline-block;width:10px;height:10px;background:var(--blue);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Ganhos</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Custos</span>
+    </div>
+    <div class="chart-wrap" id="perf-mensal-chart"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     ABA 5 — METAS
+══════════════════════════════════ -->
+<div class="page" id="page-metas">
+
+  <div class="meta-box" id="meta-mensal-box">
+    <div>
+      <div class="meta-box-label">Total dos gastos fixos</div>
+      <div class="meta-box-val" id="meta-mensal-calc">R$ 0,00</div>
+    </div>
+    <div style="text-align:right">
+      <div class="meta-box-label">= Meta Mensal</div>
+      <div class="meta-box-sub" id="meta-mensal-sub">0 itens</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Metas de Ganho</div>
+    <div class="form-group">
+      <label class="form-label">Meta Diária (R$)</label>
+      <input type="number" inputmode="decimal" class="form-input" id="meta-diaria-input" placeholder="300">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Meta Semanal (R$)</label>
+      <input type="number" inputmode="decimal" class="form-input" id="meta-semanal-input" placeholder="2100">
+    </div>
+    <button class="btn btn-blue" onclick="salvarMetas()">💾 Salvar Metas</button>
+  </div>
+
+  <div class="sec">Gastos fixos do mês</div>
+  <div id="gastos-fixos-list"></div>
+  <button class="btn-dashed" onclick="addGastoFixo()">+ Adicionar gasto fixo</button>
+</div>
+
+
+<!-- ══════════════════════════════════
+     ABA 6 — CONFIG
+══════════════════════════════════ -->
+<div class="page" id="page-config">
+
+  <div class="card">
+    <div class="card-title">Metas (atalho)</div>
+    <div class="form-group"><label class="form-label">Meta Diária (R$)</label><input type="number" inputmode="decimal" class="form-input" id="cfg-meta-diaria" value="300"></div>
+    <div class="form-group"><label class="form-label">Meta Semanal (R$)</label><input type="number" inputmode="decimal" class="form-input" id="cfg-meta-semanal" value="2100"></div>
+    <div class="form-group"><label class="form-label">Meta Mensal (R$)</label><input type="number" inputmode="decimal" class="form-input" id="cfg-meta-mensal" value="9000"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Veículo</div>
+    <div class="form-group"><label class="form-label">KM Atual</label><input type="number" inputmode="decimal" class="form-input" id="cfg-km-atual" placeholder="50000"></div>
+    <div class="form-group"><label class="form-label">Alerta de Revisão (KM rodados)</label><input type="number" inputmode="decimal" class="form-input" id="cfg-alerta-km" value="5000"></div>
+    <div class="form-group"><label class="form-label">Taxa média esperada (R$/hora)</label><input type="number" inputmode="decimal" class="form-input" id="cfg-taxa-hora" value="34"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Horários dos Turnos</div>
+    <div class="cfg-turno-wrap">
+      <div class="cfg-turno-row"><div class="cfg-turno-name">☀️ Manhã</div><div class="cfg-turno-inputs"><input type="time" class="form-input" id="cfg-manha-ini" value="07:00"><span class="hora-sep">→</span><input type="time" class="form-input" id="cfg-manha-fim" value="12:00"></div></div>
+      <div class="cfg-turno-row"><div class="cfg-turno-name">🌤️ Tarde</div><div class="cfg-turno-inputs"><input type="time" class="form-input" id="cfg-tarde-ini" value="12:00"><span class="hora-sep">→</span><input type="time" class="form-input" id="cfg-tarde-fim" value="18:00"></div></div>
+      <div class="cfg-turno-row"><div class="cfg-turno-name">🌙 Noite</div><div class="cfg-turno-inputs"><input type="time" class="form-input" id="cfg-noite-ini" value="18:00"><span class="hora-sep">→</span><input type="time" class="form-input" id="cfg-noite-fim" value="23:59"></div></div>
+    </div>
+  </div>
+  <button class="btn btn-blue" onclick="salvarConfig()">💾 Salvar Configurações</button>
+
+  <div class="sec" style="margin-top:20px">Sons</div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">Sons do app</div><div style="font-size:11px;color:var(--muted)">Tecla · Caixa registradora · Vitória</div></div>
+      <button id="cfg-sound-toggle" onclick="toggleSound()" style="background:none;border:none;font-size:28px;cursor:pointer;padding:4px">🔊</button>
+    </div>
+  </div>
+
+  <div class="sec" style="margin-top:4px">Backup & Dados</div>
+  <div class="card">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;font-weight:500">Exporte seus dados para salvar no Google Drive, WhatsApp ou e-mail.</div>
+    <div class="backup-row">
+      <button class="btn btn-blue" onclick="exportarBackup()">⬇️ Exportar Backup (.json)</button>
+      <button class="btn btn-green" onclick="exportarExcel()">📊 Exportar Excel (.xls)</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('backup-input').click()">⬆️ Restaurar Backup</button>
+      <input type="file" id="backup-input" accept=".json" style="display:none" onchange="restaurarBackup(event)">
+    </div>
+  </div>
+
+  <div class="sec" style="margin-top:4px">Zona de Perigo</div>
+  <button class="btn btn-danger" onclick="resetarDia()">🗑️ Resetar dados de hoje</button>
+  <button class="btn btn-danger" onclick="resetarTudo()">⚠️ Apagar TUDO</button>
+  <div style="height:20px"></div>
+</div>
+
+</div><!-- end content -->
+
+<!-- EDGE SIDEBAR -->
+<div class="edge-overlay" id="edge-overlay" onclick="edgeClose()"></div>
+<div class="edge-panel" id="edge-panel"></div>
+<div class="edge-handle" id="edge-handle" onclick="edgeToggle()">
+  <div class="edge-handle-grip">
+    <span></span><span></span><span></span><span></span>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════
+const ALL_TABS=[
+  {id:'hoje',     label:'Hoje',    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'},
+  {id:'financas', label:'Finanças',icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>'},
+  {id:'veiculo',  label:'Veículo', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/></svg>'},
+  {id:'analise',  label:'Análise', icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
+  {id:'metas',    label:'Metas',   icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'},
+  {id:'config',   label:'Config',  icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'},
+];
+let currentTab='hoje';
+let edgeIsOpen=false;
+let edgeTimer=null;
+const EDGE_DELAY=3500;
+let longPressTimer=null;
+let dragTabId=null;
+
+function renderEdge(){
+  const panel=document.getElementById('edge-panel');
+  panel.innerHTML='';
+  ALL_TABS.forEach((t,i)=>{
+    const btn=document.createElement('button');
+    btn.className='edge-tab'+(currentTab===t.id?' active':'');
+    btn.dataset.tabId=t.id;
+    btn.innerHTML=t.icon+'<span>'+t.label+'</span>';
+    btn.addEventListener('click',()=>{switchTab(t.id);edgeClose();});
+    setupLongPress(btn,t.id,i);
+    panel.appendChild(btn);
+    if(i===2){const sep=document.createElement('div');sep.className='edge-sep';panel.appendChild(sep);}
+  });
+}
+function switchTab(name){
+  currentTab=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  renderEdge();
+  updateHeaderSub();
+  if(name==='hoje')renderHoje();
+  else if(name==='financas'){loadCustos();renderDespesas();}
+  else if(name==='veiculo')renderAbastecimento();
+  else if(name==='analise')renderAnalise();
+  else if(name==='metas')renderMetas();
+  else if(name==='config')loadConfig();
+}
+function edgeOpen(){edgeIsOpen=true;document.getElementById('edge-panel').classList.add('open');document.getElementById('edge-overlay').classList.add('show');clearTimeout(edgeTimer);edgeTimer=setTimeout(edgeClose,EDGE_DELAY);}
+function edgeClose(){edgeIsOpen=false;clearTimeout(edgeTimer);document.getElementById('edge-panel').classList.remove('open');document.getElementById('edge-overlay').classList.remove('show');}
+function edgeToggle(){edgeIsOpen?edgeClose():edgeOpen();}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const p=document.getElementById('edge-panel');
+  ['touchstart','mousemove'].forEach(ev=>p.addEventListener(ev,()=>{
+    if(!edgeIsOpen)return;clearTimeout(edgeTimer);edgeTimer=setTimeout(edgeClose,EDGE_DELAY);
+  },{passive:true}));
+});
+
+function setupLongPress(el,tabId,idx){
+  let sx,sy;
+  const start=e=>{sx=(e.touches?e.touches[0].clientX:e.clientX);sy=(e.touches?e.touches[0].clientY:e.clientY);longPressTimer=setTimeout(()=>startDrag(el,tabId),1500);};
+  const end=()=>clearTimeout(longPressTimer);
+  const move=e=>{const dx=Math.abs((e.touches?e.touches[0].clientX:e.clientX)-sx);const dy=Math.abs((e.touches?e.touches[0].clientY:e.clientY)-sy);if(dx>10||dy>10)clearTimeout(longPressTimer);};
+  el.addEventListener('touchstart',start,{passive:true});el.addEventListener('touchend',end);el.addEventListener('touchmove',move,{passive:true});
+  el.addEventListener('mousedown',start);el.addEventListener('mouseup',end);el.addEventListener('mousemove',move);
+}
+function startDrag(el,tabId){
+  dragTabId=tabId;showToast('Arraste para reposicionar','info');el.classList.add('dragging');
+  const siblings=document.getElementById('edge-panel').querySelectorAll('.edge-tab');
+  siblings.forEach(s=>{
+    if(s===el)return;
+    const drop=()=>{
+      const fi=ALL_TABS.findIndex(t=>t.id===dragTabId);const ti=ALL_TABS.findIndex(t=>t.id===s.dataset.tabId);
+      if(fi!==-1&&ti!==-1){const[item]=ALL_TABS.splice(fi,1);ALL_TABS.splice(ti,0,item);renderEdge();showToast('Reordenado ✓','ok');}
+      el.classList.remove('dragging');dragTabId=null;
+    };
+    s.addEventListener('touchend',drop,{once:true});s.addEventListener('mouseup',drop,{once:true});
+  });
+  setTimeout(()=>{el.classList.remove('dragging');dragTabId=null;},4000);
+}
+
+// ══════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function getState(){try{return JSON.parse(localStorage.getItem('cc_state_v2')||'{}')}catch{return{}}}
+function setState(s){localStorage.setItem('cc_state_v2',JSON.stringify(s))}
+function getConfig(){
+  const def={metaDiaria:300,metaSemanal:2100,metaMensal:9000,kmAtual:0,alertaKm:5000,taxaHora:34,
+    manhaIni:'07:00',manhaFim:'12:00',tardeIni:'12:00',tardeFim:'18:00',noiteIni:'18:00',noiteFim:'23:59'};
+  try{return{...def,...JSON.parse(localStorage.getItem('cc_config')||'{}')};}catch{return def}
+}
+function setConfig(c){localStorage.setItem('cc_config',JSON.stringify(c))}
+// getDayData: turnos = {manha:{val,kmIni,kmFim,horas}, tarde:{...}, noite:{...}}
+function getDayData(k){
+  const s=getState();
+  if(!s[k])s[k]={turnos:{},custos:null,despesas:[]};
+  if(!s[k].turnos)s[k].turnos={};
+  if(!s[k].despesas)s[k].despesas=[];
+  return s[k];
+}
+function saveDayData(k,d){const s=getState();s[k]=d;setState(s)}
+function getGastosFixos(){try{return JSON.parse(localStorage.getItem('cc_gastos_fixos')||'[]')}catch{return[]}}
+function setGastosFixos(g){localStorage.setItem('cc_gastos_fixos',JSON.stringify(g))}
+function getAbastecimentos(){try{return JSON.parse(localStorage.getItem('cc_abastecimentos')||'[]')}catch{return[]}}
+function setAbastecimentos(a){localStorage.setItem('cc_abastecimentos',JSON.stringify(a))}
+function getNotifState(){try{return JSON.parse(localStorage.getItem('cc_notifs')||'{}')}catch{return{}}}
+function setNotifState(s){localStorage.setItem('cc_notifs',JSON.stringify(s))}
+
+// helper: soma ganhos do dia
+function dayTotal(data){
+  const t=data.turnos||{};
+  return(t.manha?.val||0)+(t.tarde?.val||0)+(t.noite?.val||0);
+}
+function dayHoras(data){
+  const t=data.turnos||{};
+  return(t.manha?.horas||0)+(t.tarde?.horas||0)+(t.noite?.horas||0);
+}
+function dayKm(data){
+  const t=data.turnos||{};
+  let km=0;
+  ['manha','tarde','noite'].forEach(tn=>{
+    const tr=t[tn];if(!tr)return;
+    const ini=parseFloat(tr.kmIni)||0;const fim=parseFloat(tr.kmFim)||0;
+    if(fim>ini)km+=fim-ini;
+  });
+  return km;
+}
+
+// ══════════════════════════════════════════════════
+// CLOCK + HEADER
+// ══════════════════════════════════════════════════
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+}
+setInterval(updateClock,1000);updateClock();
+function updateHeaderSub(){
+  const labels={hoje:'Registro por turno',financas:'Custos e despesas',veiculo:'Abastecimento',analise:'Análise e relatórios',metas:'Metas e gastos fixos',config:'Configurações'};
+  document.getElementById('header-sub').textContent=labels[currentTab]||'';
+}
+
+// ══════════════════════════════════════════════════
+// FORMAT
+// ══════════════════════════════════════════════════
+function fmtBRL(v){if(Math.abs(v)>=1000)return'R$ '+v.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');return'R$ '+v.toFixed(2).replace('.',',');}
+function fmtBRLFull(v){return'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+
+// ══════════════════════════════════════════════════
+// CURRENCY MASK
+// ══════════════════════════════════════════════════
+let turnoCents=0,despCents=0;
+function setupMask(id,get,set,onEnter){
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',()=>{
+    const d=el.value.replace(/\D/g,'');set(parseInt(d||'0',10));
+    const v=get();el.value=v===0?'':Math.floor(v/100).toLocaleString('pt-BR')+','+(v%100).toString().padStart(2,'0');
+    playKeyClick();
+  });
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&onEnter)onEnter();
+    if(e.key==='Backspace'){e.preventDefault();set(Math.floor(get()/10));const v=get();el.value=v===0?'':Math.floor(v/100).toLocaleString('pt-BR')+','+(v%100).toString().padStart(2,'0');}
+  });
+}
+
+// ══════════════════════════════════════════════════
+// TURNO INPUT
+// ══════════════════════════════════════════════════
+let selTurnoInput='manha';
+function selectTurnoInput(t){
+  selTurnoInput=t;
+  ['manha','tarde','noite'].forEach(x=>{
+    const btn=document.getElementById('tsel-'+x);
+    btn.className='turno-sel-btn '+x+(x===t?' on':'');
+  });
+  const card=document.getElementById('turno-input-card');
+  card.className='turno-input-card '+t;
+  const title=document.getElementById('turno-input-title');
+  const labels={manha:'☀️ TURNO MANHÃ',tarde:'🌤️ TURNO TARDE',noite:'🌙 TURNO NOITE'};
+  title.textContent=labels[t];
+  title.className='turno-input-title '+t;
+  const inp=document.getElementById('turno-valor-input');
+  inp.className='valor-input '+t;
+  const saveBtn=document.getElementById('turno-save-btn');
+  const btnLabels={manha:'💾 Salvar Turno Manhã',tarde:'💾 Salvar Turno Tarde',noite:'💾 Salvar Turno Noite'};
+  const btnClasses={manha:'btn btn-manha',tarde:'btn btn-tarde',noite:'btn btn-noite'};
+  saveBtn.textContent=btnLabels[t];saveBtn.className=btnClasses[t];
+  // preencher campos se já existe dado
+  const today=todayKey();const data=getDayData(today);
+  const tr=data.turnos[t];
+  turnoCents=0;inp.value='';
+  document.getElementById('turno-km-ini').value='';
+  document.getElementById('turno-km-fim').value='';
+  document.getElementById('turno-horas').value='';
+  if(tr){
+    turnoCents=Math.round(tr.val*100);
+    inp.value=fmtBRLFull(tr.val).replace('R$ ','');
+    document.getElementById('turno-km-ini').value=tr.kmIni||'';
+    document.getElementById('turno-km-fim').value=tr.kmFim||'';
+    document.getElementById('turno-horas').value=tr.horas||'';
+  }
+  inp.focus();
+}
+
+function salvarTurno(){
+  const val=turnoCents/100;
+  if(!val||val<=0){showToast('Informe um valor válido','err');return}
+  const kmIni=document.getElementById('turno-km-ini').value;
+  const kmFim=document.getElementById('turno-km-fim').value;
+  const horas=parseFloat(document.getElementById('turno-horas').value)||0;
+  const today=todayKey();const data=getDayData(today);
+  const isEdit=!!data.turnos[selTurnoInput];
+  data.turnos[selTurnoInput]={val,kmIni:kmIni?parseFloat(kmIni):null,kmFim:kmFim?parseFloat(kmFim):null,horas,time:new Date().toISOString()};
+  saveDayData(today,data);
+  // limpar campos
+  turnoCents=0;document.getElementById('turno-valor-input').value='';
+  document.getElementById('turno-km-ini').value='';
+  document.getElementById('turno-km-fim').value='';
+  document.getElementById('turno-horas').value='';
+  const tLabel={manha:'Manhã ☀️',tarde:'Tarde 🌤️',noite:'Noite 🌙'};
+  playCashRegister();
+  showToast((isEdit?'✏️ Atualizado':'✅ Salvo')+' — '+tLabel[selTurnoInput]+' '+fmtBRLFull(val),'ok');
+  renderHoje();checkMetaNotifs();
+  // auto-avançar para próximo turno vazio
+  const order=['manha','tarde','noite'];const cur=order.indexOf(selTurnoInput);
+  const next=order.slice(cur+1).find(x=>!data.turnos[x]);
+  if(next)selectTurnoInput(next);
+}
+
+function deletarTurno(t){
+  if(!confirm('Remover turno '+{manha:'Manhã',tarde:'Tarde',noite:'Noite'}[t]+'?'))return;
+  const today=todayKey();const data=getDayData(today);
+  delete data.turnos[t];saveDayData(today,data);renderHoje();
+  showToast('Turno removido','info');
+  selectTurnoInput(t);
+}
+
+function editarTurno(t){selectTurnoInput(t);document.getElementById('turno-valor-input').focus();}
+
+// ══════════════════════════════════════════════════
+// RENDER HOJE
+// ══════════════════════════════════════════════════
+function renderHoje(){
+  const cfg=getConfig();const today=todayKey();const data=getDayData(today);
+  const total=dayTotal(data);const meta=cfg.metaDiaria;
+  const pct=Math.min(100,(total/meta)*100);const falta=Math.max(0,meta-total);
+  const horasTotais=dayHoras(data);
+  const turnosFeitos=Object.keys(data.turnos||{}).length;
+
+  document.getElementById('ganho-hoje').textContent=fmtBRLFull(total);
+  document.getElementById('hero-turnos-feitos').textContent=turnosFeitos+' turno'+(turnosFeitos!==1?'s':'')+' registrado'+(turnosFeitos!==1?'s':'');
+  document.getElementById('falta-val').textContent=fmtBRLFull(falta);
+  const taxaH=horasTotais>0?total/horasTotais:cfg.taxaHora;
+  document.getElementById('falta-horas').textContent='~'+(falta/taxaH).toFixed(1).replace('.',',')+'h';
+  const bar=document.getElementById('hero-bar');
+  bar.style.width=pct+'%';bar.className='hero-bar-fill'+(pct>=100?' done':'');
+  document.getElementById('hero-pct').textContent=Math.round(pct)+'% da meta diária';
+  document.getElementById('hero-meta').textContent=fmtBRL(meta);
+
+  // checkpoints
+  renderCheckpoints(total,meta,data);
+
+  // resumo 3 turnos
+  const container=document.getElementById('turnos-resumo-container');container.innerHTML='';
+  ['manha','tarde','noite'].forEach(t=>{
+    const tr=data.turnos[t];
+    const tLabel={manha:'☀️ Manhã',tarde:'🌤️ Tarde',noite:'🌙 Noite'};
+    const div=document.createElement('div');
+    div.className='turno-card '+(tr?t:'empty '+t);
+    if(!tr){
+      div.innerHTML=`<div class="turno-head">
+        <div class="turno-name">${tLabel[t]}</div>
+        <div class="turno-total empty">Não registrado</div>
+      </div>
+      <div class="turno-sub">Toque para registrar este turno</div>
+      <button class="turno-edit-btn" onclick="selectTurnoInput('${t}');document.getElementById('turno-valor-input').focus()">＋ Registrar</button>`;
+    } else {
+      const km=(tr.kmIni&&tr.kmFim&&tr.kmFim>tr.kmIni)?(tr.kmFim-tr.kmIni):null;
+      const rph=tr.horas>0?(tr.val/tr.horas):null;
+      div.innerHTML=`<div class="turno-head">
+        <div class="turno-name">${tLabel[t]}</div>
+        <div class="turno-total">${fmtBRLFull(tr.val)}</div>
+      </div>
+      <div class="turno-sub">${tr.horas?tr.horas+'h trabalhadas':''}${tr.horas&&km?' · ':''}${km?km.toFixed(0)+' km':''}</div>
+      <div class="turno-meta-row">
+        ${tr.horas?`<div class="tmeta">⏱️ <span class="sv2">${fmtBRL(tr.val/tr.horas)}/h</span></div>`:''}
+        ${km?`<div class="tmeta">📍 <span class="sv2">${km.toFixed(0)} km</span></div>`:''}
+        <button class="turno-edit-btn" onclick="editarTurno('${t}')">✏️ Editar</button>
+        <button class="turno-del-btn" onclick="deletarTurno('${t}')">✕</button>
+      </div>`;
+    }
+    container.appendChild(div);
+  });
+
+  // auto-selecionar turno atual se vazio
+  const curT=getTurnoAtual();
+  if(!data.turnos[curT])selectTurnoInput(curT);
+
+  // notif banner
+  const nb=document.getElementById('notif-banner');
+  if('Notification'in window&&Notification.permission==='default')nb.classList.add('show');
+  else nb.classList.remove('show');
+  updateNotifBtn();
+}
+
+function renderCheckpoints(total,meta,data){
+  const card=document.getElementById('cp-card');const rows=document.getElementById('cp-rows');
+  rows.innerHTML='';let any=false;
+  const t=data.turnos||{};
+  // checkpoint: depois que manhã foi registrada, vemos se está no caminho
+  if(t.manha){
+    any=true;
+    const exp=meta*0.33;const diff=t.manha.val-exp;
+    const row=document.createElement('div');row.className='cp-row';
+    row.innerHTML=`<span>☀️ Manhã (esperado ${fmtBRL(exp)})</span>
+      <span class="cp-val ${diff>=0?'pos':'neg'}">${diff>=0?'+':''}${fmtBRL(diff)}</span>`;
+    rows.appendChild(row);
+  }
+  if(t.tarde){
+    any=true;
+    const exp=meta*0.67;const got=(t.manha?.val||0)+(t.tarde?.val||0);const diff=got-exp;
+    const row=document.createElement('div');row.className='cp-row';
+    row.innerHTML=`<span>🌤️ Após tarde (esperado ${fmtBRL(exp)})</span>
+      <span class="cp-val ${diff>=0?'pos':'neg'}">${diff>=0?'+':''}${fmtBRL(diff)}</span>`;
+    rows.appendChild(row);
+  }
+  card.style.display=any?'block':'none';
+}
+
+function getTurnoAtual(){
+  const cfg=getConfig();const now=new Date();const cur=now.getHours()*60+now.getMinutes();
+  const tm=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
+  if(cur>=tm(cfg.manhaIni)&&cur<tm(cfg.manhaFim))return'manha';
+  if(cur>=tm(cfg.tardeIni)&&cur<tm(cfg.tardeFim))return'tarde';
+  return'noite';
+}
+
+// ══════════════════════════════════════════════════
+// FINANCIAL SUB-TABS
+// ══════════════════════════════════════════════════
+let finTab='custos';
+function swFin(tab){
+  finTab=tab;
+  ['custos','despesas'].forEach(t=>{
+    document.getElementById('sw-'+t).className='tab-sw-btn'+(t===tab?' on':'');
+    document.getElementById('fin-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='despesas')renderDespesas();
+  else loadCustos();
+}
+
+// ══════════════════════════════════════════════════
+// CUSTOS (agora usa dados dos turnos)
+// ══════════════════════════════════════════════════
+function loadCustos(){
+  const today=todayKey();
+  const di=document.getElementById('custos-date');
+  if(!di.value)di.value=today;
+  updateCustosUI();
+}
+function updateCustosUI(){
+  const today=todayKey();const sel=document.getElementById('custos-date').value||today;
+  const isToday=sel===today;
+  document.getElementById('custos-warn').className='warn-box'+(isToday?'':' show');
+  const data=getDayData(sel);
+  if(data.custos){
+    const c=data.custos;
+    document.getElementById('preco-comb').value=c.preco||'';
+    document.getElementById('autonomia').value=c.auto||'';
+    document.getElementById('gastos-extras').value=c.extras||'';
+  } else {
+    ['preco-comb','autonomia','gastos-extras'].forEach(id=>document.getElementById(id).value='');
+  }
+  // preview dos turnos
+  const t=data.turnos||{};const preview=document.getElementById('custos-turnos-preview');
+  let lines=[];
+  ['manha','tarde','noite'].forEach(tn=>{
+    const tr=t[tn];if(!tr)return;
+    const lbl={manha:'☀️ Manhã',tarde:'🌤️ Tarde',noite:'🌙 Noite'};
+    const km=(tr.kmIni&&tr.kmFim&&tr.kmFim>tr.kmIni)?(tr.kmFim-tr.kmIni):null;
+    lines.push(`<div style="padding:3px 0;border-bottom:1px solid var(--blue-b);display:flex;justify-content:space-between">
+      <span><b>${lbl[tn]}</b>${tr.horas?' · '+tr.horas+'h':''}${km?' · '+km.toFixed(0)+' km':''}</span>
+      <span style="font-family:var(--mono);font-weight:700">${fmtBRL(tr.val)}</span>
+    </div>`);
+  });
+  const kmTotal=dayKm(data);const hTotal=dayHoras(data);
+  if(lines.length){
+    lines.push(`<div style="padding:3px 0;font-size:10px;color:var(--muted)">Total: ${hTotal.toFixed(1)}h · ${kmTotal.toFixed(0)} km</div>`);
+    preview.innerHTML=lines.join('');
+  } else {
+    preview.innerHTML='Nenhum turno registrado para '+sel;
+  }
+}
+document.getElementById('custos-date').addEventListener('change',updateCustosUI);
+
+function calcularCustos(){
+  const sel=document.getElementById('custos-date').value||todayKey();
+  const preco=parseFloat(document.getElementById('preco-comb').value);
+  const auto=parseFloat(document.getElementById('autonomia').value);
+  const extras=parseFloat(document.getElementById('gastos-extras').value)||0;
+  if([preco,auto].some(isNaN)){showToast('Informe preço do comb. e autonomia','err');return}
+  const data=getDayData(sel);
+  const ganho=dayTotal(data);
+  const km=dayKm(data);const horas=dayHoras(data);
+  const litros=km>0?km/auto:0;const custoComb=litros*preco;const total=custoComb+extras;
+  const desp=(data.despesas||[]).reduce((s,d)=>s+d.val,0);
+  const liquido=ganho-total-desp;
+  document.getElementById('res-km').textContent=km>0?km.toFixed(1)+' km':'--';
+  document.getElementById('res-horas').textContent=horas>0?horas.toFixed(1)+'h':'--';
+  document.getElementById('res-litros').textContent=litros>0?litros.toFixed(2)+' L':'--';
+  document.getElementById('res-comb').textContent=fmtBRLFull(custoComb);
+  document.getElementById('res-extras').textContent=fmtBRLFull(extras);
+  document.getElementById('res-total').textContent=fmtBRLFull(total);
+  const liqEl=document.getElementById('res-liquido');
+  liqEl.textContent=fmtBRLFull(liquido);liqEl.className='res-val '+(liquido>=0?'pos':'neg');
+  data.custos={preco,auto,extras,custoComb,total,km,horas,litros};
+  saveDayData(sel,data);
+  document.getElementById('resultado-custos').classList.add('show');
+  showToast('Custos salvos ✅','ok');
+}
+
+// ══════════════════════════════════════════════════
+// DESPESAS
+// ══════════════════════════════════════════════════
+function addDespesa(){
+  const desc=document.getElementById('desp-desc').value.trim();
+  const val=despCents/100;
+  if(!desc||!val){showToast('Preencha descrição e valor','err');return}
+  const today=todayKey();const data=getDayData(today);
+  if(!data.despesas)data.despesas=[];
+  data.despesas.push({val,desc,time:new Date().toISOString()});
+  saveDayData(today,data);
+  document.getElementById('desp-desc').value='';
+  despCents=0;document.getElementById('desp-val-input').value='';
+  showToast('Despesa adicionada','ok');renderDespesas();
+}
+function removeDespesa(idx){
+  const today=todayKey();const data=getDayData(today);
+  data.despesas.splice(idx,1);saveDayData(today,data);renderDespesas();
+}
+function renderDespesas(){
+  const today=todayKey();const data=getDayData(today);const state=getState();
+  const desps=data.despesas||[];
+  const ganho=dayTotal(data);const tot=desps.reduce((s,d)=>s+d.val,0);const liquido=ganho-tot;
+  const list=document.getElementById('despesas-hoje-list');list.innerHTML='';
+  if(!desps.length)list.innerHTML='<div class="empty-msg">Nenhuma despesa hoje</div>';
+  else desps.forEach((d,i)=>{
+    const el=document.createElement('div');el.className='desp-item';
+    el.innerHTML=`<span class="desp-desc">${d.desc}</span><span class="desp-val">${fmtBRL(d.val)}</span><span class="desp-del" onclick="removeDespesa(${i})">×</span>`;
+    list.appendChild(el);
+  });
+  document.getElementById('desp-total-hoje').textContent=fmtBRLFull(tot);
+  document.getElementById('desp-ganhos-hoje').textContent=fmtBRLFull(ganho);
+  const liq=document.getElementById('desp-liquido-hoje');
+  liq.textContent=fmtBRLFull(liquido);liq.className='sv '+(liquido>=0?'green':'red');
+  const keys=Object.keys(state).sort().reverse();
+  const hist=document.getElementById('despesas-hist-list');hist.innerHTML='';let shown=0;
+  keys.forEach(k=>{
+    if(k===today)return;
+    const dd=state[k]||{};const ds=dd.despesas||[];if(!ds.length)return;shown++;
+    const t2=ds.reduce((s,d)=>s+d.val,0);const[yr,mo,dy]=k.split('-');
+    const el=document.createElement('div');el.className='log-day';
+    el.innerHTML=`<div class="log-day-head"><div class="log-day-date">${dy}/${mo}/${yr} · ${ds.length} item${ds.length!==1?'s':''}</div><div class="log-day-total" style="color:var(--red)">${fmtBRLFull(t2)}</div></div>`+
+      ds.map(d=>`<div class="log-row"><span>${d.desc}</span><span class="sv red">${fmtBRL(d.val)}</span></div>`).join('');
+    hist.appendChild(el);
+  });
+  if(!shown)hist.innerHTML='<div class="log-empty">Nenhum histórico</div>';
+}
+
+// ══════════════════════════════════════════════════
+// ABASTECIMENTO
+// ══════════════════════════════════════════════════
+let selComb='gasolina';
+function selectComb(c){
+  selComb=c;
+  ['gasolina','etanol','gnv'].forEach(x=>document.getElementById('comb-'+x).className='comb-btn'+(x===c?' on':''));
+  updateAbastCalc();
+}
+function updateAbastCalc(){
+  const valor=parseFloat(document.getElementById('abast-valor').value)||0;
+  const autoEta=parseFloat(document.getElementById('abast-autonomia-eta').value)||0;
+  const autoGas=parseFloat(document.getElementById('abast-autonomia-gas').value)||0;
+  const pg=parseFloat(document.getElementById('abast-preco-gas').value)||0;
+  const pe=parseFloat(document.getElementById('abast-preco-eta').value)||0;
+  const preco=selComb==='gasolina'?pg:selComb==='etanol'?pe:0;
+  const auto=selComb==='gasolina'?autoGas:selComb==='etanol'?autoEta:0;
+  const litros=preco>0?valor/preco:0;const alcance=litros>0&&auto>0?litros*auto:0;
+  document.getElementById('abast-litros-calc').textContent=litros>0?litros.toFixed(2)+' L':'--';
+  document.getElementById('abast-alcance-calc').textContent=alcance>0?alcance.toFixed(0)+' km':'--';
+  const compRow=document.getElementById('abast-comparativo-row');
+  if(pg>0&&pe>0&&autoGas>0&&autoEta>0){
+    const base=valor>0?valor:100;
+    const kmGas=(base/pg)*autoGas;const kmEta=(base/pe)*autoEta;
+    if(kmEta>kmGas){
+      document.getElementById('abast-vantagem').textContent='🌿 Álcool vantajoso';
+      document.getElementById('abast-vantagem').style.color='var(--green)';
+      compRow.style.display='flex';
+      document.getElementById('abast-comp-label').textContent=`Álcool: ${kmEta.toFixed(0)} km vs Gasolina: ${kmGas.toFixed(0)} km`;
+      document.getElementById('abast-comp-val').textContent=`+${(kmEta-kmGas).toFixed(0)} km`;
+      document.getElementById('abast-comp-val').className='sv green';
+    } else {
+      document.getElementById('abast-vantagem').textContent='⛽ Gasolina vantajosa';
+      document.getElementById('abast-vantagem').style.color='var(--blue)';
+      compRow.style.display='flex';
+      document.getElementById('abast-comp-label').textContent=`Gasolina: ${kmGas.toFixed(0)} km vs Álcool: ${kmEta.toFixed(0)} km`;
+      document.getElementById('abast-comp-val').textContent=`+${(kmGas-kmEta).toFixed(0)} km`;
+      document.getElementById('abast-comp-val').className='sv blue';
+    }
+  } else if(pg>0&&pe>0){
+    const r=pe/pg;
+    document.getElementById('abast-vantagem').textContent=r<0.70?`🌿 Álcool vantajoso (${Math.round(r*100)}% da gasolina)`:`⛽ Gasolina vantajosa (etanol a ${Math.round(r*100)}%)`;
+    document.getElementById('abast-vantagem').style.color='var(--orange)';
+    compRow.style.display='none';
+  } else {
+    document.getElementById('abast-vantagem').textContent='Informe os preços e autonomias para comparar';
+    document.getElementById('abast-vantagem').style.color='var(--muted)';
+    compRow.style.display='none';
+  }
+}
+['abast-valor','abast-autonomia-gas','abast-autonomia-eta','abast-preco-gas','abast-preco-eta'].forEach(id=>{
+  const el=document.getElementById(id);if(el)el.addEventListener('input',updateAbastCalc);
+});
+function salvarAbastecimento(){
+  const km=parseFloat(document.getElementById('abast-km').value);
+  const valor=parseFloat(document.getElementById('abast-valor').value);
+  const posto=document.getElementById('abast-posto').value.trim()||'Posto';
+  const pg=parseFloat(document.getElementById('abast-preco-gas').value)||0;
+  const pe=parseFloat(document.getElementById('abast-preco-eta').value)||0;
+  const autoGas=parseFloat(document.getElementById('abast-autonomia-gas').value)||0;
+  const autoEta=parseFloat(document.getElementById('abast-autonomia-eta').value)||0;
+  const auto=selComb==='gasolina'?autoGas:selComb==='etanol'?autoEta:0;
+  if(isNaN(km)||isNaN(valor)){showToast('Preencha KM e valor','err');return}
+  const preco=selComb==='gasolina'?pg:selComb==='etanol'?pe:0;
+  const litros=preco>0?valor/preco:0;
+  const lista=getAbastecimentos();
+  lista.push({km,valor,posto,comb:selComb,preco,litros,auto,autoGas,autoEta,date:new Date().toISOString(),precoGas:pg,precoEta:pe});
+  setAbastecimentos(lista);
+  showToast('Abastecimento salvo ⛽','ok');
+  ['abast-km','abast-valor','abast-posto'].forEach(id=>document.getElementById(id).value='');
+  renderAbastecimento();
+}
+function renderAbastecimento(){
+  const lista=getAbastecimentos().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const entre=document.getElementById('abast-entre-info');const aviso=document.getElementById('abast-primeiro-aviso');
+  if(lista.length<=1){entre.style.display='none';aviso.style.display=lista.length===0?'none':'block';}
+  else{
+    aviso.style.display='none';entre.style.display='block';
+    const last=lista[lista.length-1];const prev=lista[lista.length-2];
+    const kmE=last.km-prev.km;const litrosE=last.auto>0?kmE/last.auto:0;const custoE=litrosE*(last.preco||0);
+    document.getElementById('abast-km-entre').textContent=kmE.toFixed(0)+' km';
+    document.getElementById('abast-litros-entre').textContent=litrosE>0?litrosE.toFixed(2)+' L':'--';
+    document.getElementById('abast-custo-entre').textContent=custoE>0?fmtBRL(custoE):'--';
+  }
+  const hist=document.getElementById('abast-hist-list');hist.innerHTML='';
+  const rev=[...lista].reverse();
+  if(!rev.length){hist.innerHTML='<div class="log-empty">Nenhum abastecimento registrado</div>';return}
+  rev.forEach(a=>{
+    const d=new Date(a.date);const ds=d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
+    const el=document.createElement('div');el.className='abast-hist-item';
+    el.innerHTML=`<div class="abast-hist-head"><div class="abast-hist-posto">⛽ ${a.posto}</div><div class="abast-hist-val">${fmtBRL(a.valor)}</div></div>
+      <div class="abast-hist-row"><span>${ds}</span><span>${a.comb==='gasolina'?'⛽ Gasolina':a.comb==='etanol'?'🌿 Etanol':'💨 GNV'}</span></div>
+      <div class="abast-hist-row"><span>KM: ${a.km.toLocaleString('pt-BR')}</span><span>${a.litros>0?a.litros.toFixed(2)+' L':''} ${a.preco>0?'· R$'+a.preco.toFixed(2)+'/L':''}</span></div>
+      ${a.auto>0?`<div class="abast-hist-row"><span>Alcance estimado</span><span>${(a.litros*a.auto).toFixed(0)} km</span></div>`:''}`;
+    hist.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// ANÁLISE SUB-TABS
+// ══════════════════════════════════════════════════
+let anTab='dash';
+function swAnalise(tab){
+  anTab=tab;
+  ['dash','mensal','hist','perf'].forEach(t=>{
+    document.getElementById('sw-'+t).className='tab-sw-btn'+(t===tab?' on':'');
+    document.getElementById('an-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='dash')renderDash();
+  else if(tab==='mensal')renderMensal();
+  else if(tab==='hist')renderHistorico();
+  else if(tab==='perf')renderPerformance();
+}
+function renderAnalise(){
+  if(anTab==='dash')renderDash();
+  else if(anTab==='mensal')renderMensal();
+  else if(anTab==='hist')renderHistorico();
+  else if(anTab==='perf')renderPerformance();
+}
+
+// ══════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════
+function renderDash(){
+  const state=getState();const cfg=getConfig();const today=todayKey();
+  const[yr,mo]=today.slice(0,7).split('-').map(Number);
+  const daysInMonth=new Date(yr,mo,0).getDate();
+  let bruto=0,custos=0,despesas=0,dias=0,totalHoras=0;
+  let bestDay=0,bestDayDate='';
+  const turnos={manha:0,tarde:0,noite:0};
+  const days=[];
+  for(let d=1;d<=daysInMonth;d++){
+    const k=`${yr}-${mo.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    const dd=state[k]||{};
+    const g=dayTotal(dd);const c=(dd.custos||{}).total||0;const desp=(dd.despesas||[]).reduce((s,dd2)=>s+dd2.val,0);
+    const h=dayHoras(dd);
+    const t=dd.turnos||{};
+    Object.keys(t).forEach(tn=>turnos[tn]=(turnos[tn]||0)+(t[tn].val||0));
+    if(g>0){bruto+=g;custos+=c;despesas+=desp;dias++;totalHoras+=h;if(g>bestDay){bestDay=g;bestDayDate=k;}}
+    days.push({d,ganhos:g,custos:c,hasData:g>0,isToday:k===today});
+  }
+  const lucro=bruto-custos-despesas;
+  document.getElementById('dash-bruto').textContent=fmtBRL(bruto);
+  document.getElementById('dash-lucro').textContent=fmtBRL(lucro);
+  document.getElementById('dash-dias').textContent=dias;
+  document.getElementById('dash-horas').textContent=totalHoras>0?totalHoras.toFixed(0)+'h':'0h';
+  // gauge
+  const pct=cfg.metaMensal>0?Math.min(100,(bruto/cfg.metaMensal)*100):0;
+  document.getElementById('gauge-pct').textContent=Math.round(pct)+'%';
+  document.getElementById('gauge-sub').textContent=fmtBRL(bruto)+' de '+fmtBRL(cfg.metaMensal);
+  const falta=Math.max(0,cfg.metaMensal-bruto);
+  document.getElementById('gauge-falta').textContent=falta>0?'Falta '+fmtBRL(falta):'🎉 Meta batida!';
+  drawGauge(pct);
+  drawLineChart(days);
+  // turno bars
+  const maxT=Math.max(turnos.manha,turnos.tarde,turnos.noite,1);
+  const tc={manha:'Manhã ☀️',tarde:'Tarde 🌤️',noite:'Noite 🌙'};
+  document.getElementById('dash-turnos-bars').innerHTML=['manha','tarde','noite'].map(t=>`
+    <div class="plat-bar-item">
+      <div class="plat-bar-label"><span>${tc[t]}</span><span class="sv">${fmtBRL(turnos[t]||0)}</span></div>
+      <div class="plat-bar-track"><div class="plat-bar-fill ${t}" style="width:${Math.round((turnos[t]||0)/maxT*100)}%"></div></div>
+    </div>`).join('');
+  // stats
+  document.getElementById('dash-best-val').textContent=fmtBRL(bestDay);
+  document.getElementById('dash-best-date').textContent=bestDayDate?bestDayDate.split('-').reverse().join('/'):'—';
+  const media=dias>0?bruto/dias:0;
+  document.getElementById('dash-media-val').textContent=fmtBRL(media);
+  document.getElementById('dash-media-sub').textContent='meta: '+fmtBRL(cfg.metaDiaria);
+  const topT=Object.entries(turnos).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('dash-turno-top').textContent=topT&&topT[1]>0?(topT[0]==='manha'?'Manhã ☀️':topT[0]==='tarde'?'Tarde 🌤️':'Noite 🌙'):'—';
+  document.getElementById('dash-turno-sub').textContent=topT&&topT[1]>0?fmtBRL(topT[1]):'—';
+  const rph=totalHoras>0?bruto/totalHoras:0;
+  document.getElementById('dash-rph').textContent=rph>0?fmtBRL(rph):'--';
+  document.getElementById('dash-rph-sub').textContent=totalHoras>0?totalHoras.toFixed(0)+'h registradas':'sem horas';
+}
+
+function drawGauge(pct){
+  const cv=document.getElementById('gauge-canvas');if(!cv)return;
+  const ctx=cv.getContext('2d');const W=100,cx=50,cy=55,r=36,sw=9;
+  ctx.clearRect(0,0,W,W+10);
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI*0.75,Math.PI*0.25);ctx.strokeStyle='#e2e8f0';ctx.lineWidth=sw;ctx.lineCap='round';ctx.stroke();
+  const end=Math.PI*0.75+(Math.PI*1.5)*(pct/100);
+  const grd=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
+  grd.addColorStop(0,'#dc2626');grd.addColorStop(0.5,'#f97316');grd.addColorStop(1,'#16a34a');
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI*0.75,end);ctx.strokeStyle=grd;ctx.lineWidth=sw;ctx.lineCap='round';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fillStyle='#2563eb';ctx.fill();
+}
+function drawLineChart(data){
+  const cv=document.getElementById('line-canvas');if(!cv)return;
+  const dpr=window.devicePixelRatio||1;const W=cv.offsetWidth||340;const H=130;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  const pad={top:10,right:10,bottom:22,left:38};const cw=W-pad.left-pad.right;const ch=H-pad.top-pad.bottom;
+  const maxV=Math.max(...data.map(d=>d.ganhos),1);const today=new Date().getDate();
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;
+  [0.25,0.5,0.75,1].forEach(f=>{const y=pad.top+ch*(1-f);ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();ctx.fillStyle='#94a3b8';ctx.font='9px monospace';ctx.textAlign='right';ctx.fillText(fmtBRL(maxV*f),pad.left-4,y+3);});
+  const pts=data.map((d,i)=>({x:pad.left+(i/(data.length-1))*cw,y:pad.top+ch*(1-d.ganhos/maxV)}));
+  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,pad.top+ch);ctx.lineTo(pts[0].x,pad.top+ch);ctx.closePath();
+  const ag=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);ag.addColorStop(0,'rgba(37,99,235,0.2)');ag.addColorStop(1,'rgba(37,99,235,0)');ctx.fillStyle=ag;ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.strokeStyle='#2563eb';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+  data.forEach((d,i)=>{if(!d.hasData&&d.d!==today)return;const p=pts[i];ctx.beginPath();ctx.arc(p.x,p.y,d.d===today?5:3,0,Math.PI*2);ctx.fillStyle=d.d===today?'#f97316':'#2563eb';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();});
+  ctx.fillStyle='#94a3b8';ctx.font='9px monospace';ctx.textAlign='center';data.forEach((d,i)=>{if(d.d%5===0||d.d===1)ctx.fillText(d.d,pts[i].x,H-5);});
+}
+
+// ══════════════════════════════════════════════════
+// MENSAL
+// ══════════════════════════════════════════════════
+function renderMensal(){
+  const state=getState();const today=todayKey();
+  const[yr,mo]=today.slice(0,7).split('-').map(Number);
+  const dim=new Date(yr,mo,0).getDate();
+  let tG=0,tC=0,tDias=0,tH=0,tM=0,tT=0,tN=0;
+  const days=[];
+  for(let d=1;d<=dim;d++){
+    const k=`${yr}-${mo.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    const dd=state[k]||{};
+    const g=dayTotal(dd);const c=(dd.custos||{}).total||0;const h=dayHoras(dd);
+    const t=dd.turnos||{};
+    const has=g>0||c>0;
+    if(has){tG+=g;tC+=c;tDias++;tH+=h;tM+=(t.manha?.val||0);tT+=(t.tarde?.val||0);tN+=(t.noite?.val||0);}
+    days.push({d,ganhos:g,custos:c,lucro:g-c,hasData:has,isToday:k===today});
+  }
+  document.getElementById('men-ganhos').textContent=fmtBRL(tG);
+  document.getElementById('men-custos').textContent=fmtBRL(tC);
+  const lEl=document.getElementById('men-lucro');const lucro=tG-tC;
+  lEl.textContent=fmtBRL(lucro);lEl.className='kpi-val '+(lucro>=0?'green':'red');
+  document.getElementById('men-dias').textContent=tDias;
+  document.getElementById('men-media').textContent=tDias?fmtBRL(tG/tDias):'R$ 0';
+  document.getElementById('men-horas').textContent=tH>0?tH.toFixed(0)+'h':'0h';
+  document.getElementById('men-manha').textContent=fmtBRL(tM);
+  document.getElementById('men-tarde').textContent=fmtBRL(tT);
+  document.getElementById('men-noite').textContent=fmtBRL(tN);
+  const mns=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const chart=document.getElementById('mensal-chart');
+  chart.innerHTML=`<div class="chart-head"><div class="chart-head-label">${mns[mo-1]} ${yr}</div><div class="chart-head-label">${tDias} dias</div></div>`;
+  const maxV=Math.max(...days.map(d=>Math.max(d.ganhos,d.custos)),1);
+  days.forEach(day=>{
+    const row=document.createElement('div');row.className='day-row'+(day.isToday?' today':'');
+    const gp=Math.round((day.ganhos/maxV)*100);const cp=Math.round((day.custos/maxV)*100);
+    const lc=day.lucro>0?'pos':day.lucro<0?'neg':'zero';
+    row.innerHTML=`<div class="day-num">${day.d.toString().padStart(2,'0')}${day.isToday?' ★':''}</div>
+      <div class="day-bars">
+        <div class="bar-wrap"><div class="bar g" style="width:${gp}%"></div><div class="bar-val">${day.ganhos>0?fmtBRL(day.ganhos):''}</div></div>
+        <div class="bar-wrap"><div class="bar c" style="width:${cp}%"></div><div class="bar-val">${day.custos>0?fmtBRL(day.custos):''}</div></div>
+      </div>
+      <div class="day-lucro ${lc}">${day.hasData?(day.lucro>0?'+':'')+fmtBRL(day.lucro):'—'}</div>`;
+    chart.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// HISTÓRICO
+// ══════════════════════════════════════════════════
+function renderHistorico(){
+  const state=getState();const cfg=getConfig();const today=todayKey();
+  const yKey=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const todayData=state[today]||{};const ontemData=state[yKey]||{};
+  const ganhoHoje=dayTotal(todayData);const ganhoOntem=dayTotal(ontemData);
+  document.getElementById('hist-hoje').textContent=fmtBRLFull(ganhoHoje);
+  document.getElementById('hist-ontem').textContent=fmtBRLFull(ganhoOntem);
+  const tH=todayData.turnos||{};
+  document.getElementById('hist-manha-hoje').textContent=fmtBRLFull(tH.manha?.val||0);
+  document.getElementById('hist-tarde-hoje').textContent=fmtBRLFull(tH.tarde?.val||0);
+  document.getElementById('hist-noite-hoje').textContent=fmtBRLFull(tH.noite?.val||0);
+  const diff=ganhoHoje-ganhoOntem;
+  const de=document.getElementById('hist-diff-dia');
+  de.textContent=(diff>=0?'+':'')+fmtBRLFull(diff);de.style.color=diff>=0?'var(--green)':'var(--red)';
+  const mes=today.slice(0,7);let tMes=0,dTrab=0;
+  Object.keys(state).forEach(k=>{if(k.startsWith(mes)){const g=dayTotal(state[k]||{});if(g>0){tMes+=g;dTrab++;}}});
+  document.getElementById('hist-mes-total').textContent=fmtBRLFull(tMes);
+  document.getElementById('hist-dias').textContent=dTrab;
+  document.getElementById('hist-media').textContent=dTrab?fmtBRLFull(tMes/dTrab):'R$ 0,00';
+  document.getElementById('hist-meta-mensal').textContent=fmtBRLFull(cfg.metaMensal);
+  document.getElementById('hist-meta-pct').textContent=Math.round((tMes/cfg.metaMensal)*100)+'%';
+  const log=document.getElementById('log-list');log.innerHTML='';let shown=0;
+  Object.keys(state).sort().reverse().forEach(k=>{
+    const dd=state[k]||{};const g=dayTotal(dd);if(!g)return;shown++;
+    const t=dd.turnos||{};const h=dayHoras(dd);const km=dayKm(dd);
+    const[yr,mo,dy]=k.split('-');
+    const el=document.createElement('div');el.className='log-day';
+    el.innerHTML=`<div class="log-day-head"><div class="log-day-date">${dy}/${mo}/${yr}${h>0?' · '+h.toFixed(1)+'h':''}${km>0?' · '+km.toFixed(0)+'km':''}</div><div class="log-day-total">${fmtBRLFull(g)}</div></div>`+
+      (t.manha?.val?`<div class="log-row"><span>☀️ Manhã</span><span class="sv">${fmtBRL(t.manha.val)}</span></div>`:'')+
+      (t.tarde?.val?`<div class="log-row"><span>🌤️ Tarde</span><span class="sv">${fmtBRL(t.tarde.val)}</span></div>`:'')+
+      (t.noite?.val?`<div class="log-row"><span>🌙 Noite</span><span class="sv">${fmtBRL(t.noite.val)}</span></div>`:'')+
+      (h>0&&g>0?`<div class="log-row"><span>⏱️ R$/hora</span><span class="sv orange">${fmtBRL(g/h)}/h</span></div>`:'');
+    log.appendChild(el);
+  });
+  if(!shown)log.innerHTML='<div class="log-empty">Nenhum dado registrado ainda</div>';
+}
+
+// ══════════════════════════════════════════════════
+// PERFORMANCE
+// ══════════════════════════════════════════════════
+function getPerfData(keys){
+  const state=getState();let g=0,c=0,km=0,lit=0,h=0,desp=0;
+  keys.forEach(k=>{
+    const dd=state[k]||{};
+    g+=dayTotal(dd);const cs=dd.custos||{};
+    c+=(cs.total||0);km+=dayKm(dd);lit+=(cs.litros||0);h+=dayHoras(dd);
+    desp+=(dd.despesas||[]).reduce((s,d)=>s+d.val,0);
+  });
+  const lucro=g-c-desp;return{g,c,km,lit,h,desp,lucro,gph:h>0?g/h:0,rpl:lit>0?g/lit:0};
+}
+function perfKpi(label,val,color){
+  return`<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-val ${color}">${val}</div></div>`;
+}
+function renderPerfGrid(id,data){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=
+    perfKpi('KM Rodados',data.km>0?data.km.toFixed(0)+' km':'--','blue')+
+    perfKpi('Horas Trabalhadas',data.h>0?data.h.toFixed(1)+'h':'--','orange')+
+    perfKpi('R$/hora',data.gph>0?fmtBRL(data.gph):'--','green')+
+    perfKpi('Litros Gastos',data.lit>0?data.lit.toFixed(2)+' L':'--','')+
+    perfKpi('Custo Comb.',data.c>0?fmtBRL(data.c):'--','red')+
+    perfKpi('Despesas',data.desp>0?fmtBRL(data.desp):'--','red')+
+    perfKpi('Custo Total',fmtBRL(data.c+data.desp),'red')+
+    perfKpi('Lucro Líquido',fmtBRL(data.lucro),data.lucro>=0?'green':'red');
+}
+function renderPerformance(){
+  const today=todayKey();const now=new Date();
+  renderPerfGrid('perf-diaria-grid',getPerfData([today]));
+  const wk=[];for(let i=0;i<7;i++){const d=new Date(now);d.setDate(d.getDate()-i);wk.push(d.toISOString().slice(0,10));}
+  renderPerfGrid('perf-semanal-grid',getPerfData(wk));
+  renderConselheiro();
+  const[yr,mo]=today.slice(0,7).split('-').map(Number);const dim=new Date(yr,mo,0).getDate();
+  const state=getState();let tMes=0,cMes=0,dMes=0;
+  const days=[];
+  for(let d=1;d<=dim;d++){
+    const k=`${yr}-${mo.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    const dd=state[k]||{};const g=dayTotal(dd);const c=(dd.custos||{}).total||0;
+    if(g>0){tMes+=g;cMes+=c;dMes++;}
+    days.push({d,ganhos:g,custos:c,hasData:g>0,isToday:k===today});
+  }
+  document.getElementById('pm-bruto').textContent=fmtBRL(tMes);
+  document.getElementById('pm-custos').textContent=fmtBRL(cMes);
+  document.getElementById('pm-lucro').textContent=fmtBRL(tMes-cMes);
+  document.getElementById('pm-dias').textContent=dMes;
+  const mns=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const chart=document.getElementById('perf-mensal-chart');
+  chart.innerHTML=`<div class="chart-head"><div class="chart-head-label">${mns[mo-1]} ${yr}</div><div class="chart-head-label">${dMes} dias</div></div>`;
+  const maxV=Math.max(...days.map(d=>Math.max(d.ganhos,d.custos)),1);
+  days.forEach(day=>{
+    const row=document.createElement('div');row.className='day-row'+(day.isToday?' today':'');
+    const gp=Math.round((day.ganhos/maxV)*100);const cp=Math.round((day.custos/maxV)*100);
+    const lucro=day.ganhos-day.custos;const lc=lucro>0?'pos':lucro<0?'neg':'zero';
+    row.innerHTML=`<div class="day-num">${day.d.toString().padStart(2,'0')}${day.isToday?' ★':''}</div>
+      <div class="day-bars">
+        <div class="bar-wrap"><div class="bar g" style="width:${gp}%"></div><div class="bar-val">${day.ganhos>0?fmtBRL(day.ganhos):''}</div></div>
+        <div class="bar-wrap"><div class="bar c" style="width:${cp}%"></div><div class="bar-val">${day.custos>0?fmtBRL(day.custos):''}</div></div>
+      </div>
+      <div class="day-lucro ${lc}">${day.hasData?(lucro>0?'+':'')+fmtBRL(lucro):'—'}</div>`;
+    chart.appendChild(row);
+  });
+}
+function renderConselheiro(){
+  const cfg=getConfig();const today=todayKey();const now=new Date();const state=getState();
+  const[yr,mo]=today.slice(0,7).split('-').map(Number);
+  const dim=new Date(yr,mo,0).getDate();const dom=now.getDate();const rest=dim-dom;
+  let tMes=0,dTrab=0,tHoras=0;
+  for(let d=1;d<=dom;d++){
+    const k=`${yr}-${mo.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    const dd=state[k]||{};const g=dayTotal(dd);if(g>0){tMes+=g;dTrab++;tHoras+=dayHoras(dd);}
+  }
+  const media=dTrab>0?tMes/dTrab:0;const falta=Math.max(0,cfg.metaMensal-tMes);const nec=rest>0?falta/rest:0;
+  const rph=tHoras>0?tMes/tHoras:0;
+  const msgs=[];
+  if(rest>0&&falta>0)msgs.push(`Para bater a meta de ${fmtBRL(cfg.metaMensal)}, precisa de <strong style="color:var(--orange)">${fmtBRL(nec)}/dia</strong> nos próximos ${rest} dia${rest!==1?'s':''}.`);
+  else if(falta<=0)msgs.push(`🏆 <strong style="color:var(--green)">Meta mensal batida!</strong> Você fez ${fmtBRL(tMes)} de ${fmtBRL(cfg.metaMensal)}. Continue!`);
+  if(media>0&&nec>0){
+    if(media>=nec)msgs.push(`✅ Média diária de ${fmtBRL(media)} está <strong style="color:var(--green)">acima do necessário</strong>. Mantendo esse ritmo você bate a meta.`);
+    else msgs.push(`⚠️ Média (${fmtBRL(media)}) está ${fmtBRL(nec-media)} <strong style="color:var(--red)">abaixo do necessário</strong>. Tente mais um turno.`);
+  }
+  if(rph>0)msgs.push(`⏱️ Sua taxa atual é <strong style="color:var(--blue)">${fmtBRL(rph)}/hora</strong> (${tHoras.toFixed(0)}h registradas neste mês).`);
+  if(!dTrab)msgs.push('📊 Nenhum dado este mês ainda. Comece a registrar seus turnos!');
+  const c=document.getElementById('conselheiro-msgs');c.innerHTML='';
+  msgs.forEach(m=>{const el=document.createElement('div');el.className='conselheiro-msg';el.innerHTML=m;c.appendChild(el);});
+}
+
+// ══════════════════════════════════════════════════
+// METAS
+// ══════════════════════════════════════════════════
+function renderMetas(){
+  const cfg=getConfig();
+  document.getElementById('meta-diaria-input').value=cfg.metaDiaria;
+  document.getElementById('meta-semanal-input').value=cfg.metaSemanal;
+  renderGastosFixos();
+}
+function renderGastosFixos(){
+  const lista=getGastosFixos();const c=document.getElementById('gastos-fixos-list');c.innerHTML='';
+  let tot=0;
+  lista.forEach((g,i)=>{
+    tot+=g.val||0;
+    const el=document.createElement('div');el.className='gf-item';
+    el.innerHTML=`<input class="gf-desc" placeholder="Descrição" value="${g.desc||''}" onchange="updateGF(${i},'desc',this.value)">
+      <input class="gf-val" type="number" placeholder="0.00" value="${g.val?g.val.toFixed(2):''}" onchange="updateGF(${i},'val',parseFloat(this.value)||0)">
+      <span class="gf-del" onclick="removeGF(${i})">×</span>`;
+    c.appendChild(el);
+  });
+  document.getElementById('meta-mensal-calc').textContent=fmtBRL(tot);
+  document.getElementById('meta-mensal-sub').textContent=lista.length+' item'+(lista.length!==1?'s':'');
+}
+function addGastoFixo(){const l=getGastosFixos();l.push({desc:'',val:0});setGastosFixos(l);renderGastosFixos();}
+function removeGF(i){const l=getGastosFixos();l.splice(i,1);setGastosFixos(l);renderGastosFixos();}
+function updateGF(i,f,v){const l=getGastosFixos();if(l[i])l[i][f]=v;setGastosFixos(l);renderGastosFixos();}
+function salvarMetas(){
+  const cfg=getConfig();
+  cfg.metaDiaria=parseFloat(document.getElementById('meta-diaria-input').value)||300;
+  cfg.metaSemanal=parseFloat(document.getElementById('meta-semanal-input').value)||2100;
+  const l=getGastosFixos();cfg.metaMensal=l.reduce((s,g)=>s+(g.val||0),0)||cfg.metaMensal;
+  setConfig(cfg);showToast('Metas salvas ✅','ok');renderHoje();
+}
+
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+function loadConfig(){
+  const cfg=getConfig();
+  document.getElementById('cfg-meta-diaria').value=cfg.metaDiaria;
+  document.getElementById('cfg-meta-semanal').value=cfg.metaSemanal;
+  document.getElementById('cfg-meta-mensal').value=cfg.metaMensal;
+  document.getElementById('cfg-km-atual').value=cfg.kmAtual||'';
+  document.getElementById('cfg-alerta-km').value=cfg.alertaKm;
+  document.getElementById('cfg-taxa-hora').value=cfg.taxaHora;
+  document.getElementById('cfg-manha-ini').value=cfg.manhaIni;
+  document.getElementById('cfg-manha-fim').value=cfg.manhaFim;
+  document.getElementById('cfg-tarde-ini').value=cfg.tardeIni;
+  document.getElementById('cfg-tarde-fim').value=cfg.tardeFim;
+  document.getElementById('cfg-noite-ini').value=cfg.noiteIni;
+  document.getElementById('cfg-noite-fim').value=cfg.noiteFim;
+  updateSoundBtn();
+}
+function salvarConfig(){
+  setConfig({
+    metaDiaria:parseFloat(document.getElementById('cfg-meta-diaria').value)||300,
+    metaSemanal:parseFloat(document.getElementById('cfg-meta-semanal').value)||2100,
+    metaMensal:parseFloat(document.getElementById('cfg-meta-mensal').value)||9000,
+    kmAtual:parseFloat(document.getElementById('cfg-km-atual').value)||0,
+    alertaKm:parseFloat(document.getElementById('cfg-alerta-km').value)||5000,
+    taxaHora:parseFloat(document.getElementById('cfg-taxa-hora').value)||34,
+    manhaIni:document.getElementById('cfg-manha-ini').value,
+    manhaFim:document.getElementById('cfg-manha-fim').value,
+    tardeIni:document.getElementById('cfg-tarde-ini').value,
+    tardeFim:document.getElementById('cfg-tarde-fim').value,
+    noiteIni:document.getElementById('cfg-noite-ini').value,
+    noiteFim:document.getElementById('cfg-noite-fim').value,
+  });
+  showToast('Configurações salvas!','ok');renderHoje();
+}
+function resetarDia(){if(!confirm('Apagar dados de hoje?'))return;const s=getState();delete s[todayKey()];setState(s);renderHoje();showToast('Dia resetado','info');}
+function resetarTudo(){if(!confirm('Apagar TODOS os dados?'))return;localStorage.removeItem('cc_state_v2');renderHoje();showToast('Dados apagados','info');}
+
+// ══════════════════════════════════════════════════
+// NOTIFICAÇÕES
+// ══════════════════════════════════════════════════
+async function requestNotifPermission(){
+  if(!('Notification'in window)){showToast('Navegador não suporta notificações','err');return}
+  const r=await Notification.requestPermission();
+  if(r==='granted'){showToast('Notificações ativadas! 🔔','ok');renderHoje();startTurnoNotifLoop();}
+  else showToast('Permissão negada','err');
+}
+function toggleNotifications(){
+  const ns=getNotifState();ns.enabled=!ns.enabled;setNotifState(ns);updateNotifBtn();
+  showToast(ns.enabled?'Notificações ligadas 🔔':'Notificações desligadas',ns.enabled?'ok':'info');
+  if(ns.enabled)startTurnoNotifLoop();
+}
+function updateNotifBtn(){
+  const ns=getNotifState();
+  document.getElementById('notif-btn').textContent=ns.enabled?'🔔':'🔕';
+}
+
+// ── Envia notificação com tag única (substitui a anterior, sem empilhar) ──
+function sendNotif(titulo,corpo,tag){
+  if(!('Notification'in window)||Notification.permission!=='granted')return;
+  const ns=getNotifState();if(!ns.enabled)return;
+  new Notification(titulo,{body:corpo,tag:tag,renotify:true,requireInteraction:false});
+}
+
+// ── Converte "HH:MM" em minutos desde meia-noite ──
+function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m}
+
+// ── Verifica notificações de meta (50%, 75%, 100%) ──
+let notifTimer=null;
+function checkMetaNotifs(){
+  if(notifTimer)clearTimeout(notifTimer);
+  notifTimer=setTimeout(()=>{
+    const ns=getNotifState();if(!ns.enabled)return;
+    if(!('Notification'in window)||Notification.permission!=='granted')return;
+    const cfg=getConfig();const data=getDayData(todayKey());
+    const total=dayTotal(data);const pct=total/cfg.metaDiaria;
+    const milestones=[0.5,0.75,1.0];
+    milestones.forEach(m=>{
+      const k='notif_m_'+m+'_'+todayKey();
+      if(pct>=m&&!ns[k]){ns[k]=true;setNotifState(ns);
+        sendNotif('Meu Uber',m>=1?'Meta diaria batida! Parabens!':'Voce atingiu '+(m*100)+' por cento da meta diaria.','meta');
+      }
+    });
+  },500);
+}
+
+// ── Loop principal de notificações de turno (roda a cada 60s) ──
+let turnoNotifInterval=null;
+function startTurnoNotifLoop(){
+  if(turnoNotifInterval)clearInterval(turnoNotifInterval);
+  checkTurnoNotifs();
+  turnoNotifInterval=setInterval(checkTurnoNotifs,60000);
+}
+
+function checkTurnoNotifs(){
+  const ns=getNotifState();if(!ns.enabled)return;
+  if(!('Notification'in window)||Notification.permission!=='granted')return;
+  const cfg=getConfig();
+  const now=new Date();
+  const cur=now.getHours()*60+now.getMinutes();
+  const today=todayKey();
+  const data=getDayData(today);
+
+  // Define os 3 turnos com nome, horários e chaves de notif
+  const turnos=[
+    {id:'manha',nome:'Manha',label:'manha',ini:toMin(cfg.manhaIni),fim:toMin(cfg.manhaFim)},
+    {id:'tarde',nome:'Tarde',label:'tarde',ini:toMin(cfg.tardeIni),fim:toMin(cfg.tardeFim)},
+    {id:'noite',nome:'Noite',label:'noite',ini:toMin(cfg.noiteIni),fim:toMin(cfg.noiteFim)}
+  ];
+
+  turnos.forEach(t=>{
+    const kPre  ='tn_pre_'+t.id+'_'+today;   // 1h antes do início
+    const kIni  ='tn_ini_'+t.id+'_'+today;   // início do turno
+    const kEnd1 ='tn_end1_'+t.id+'_'+today;  // 1h antes do fim
+    const kFim  ='tn_fim_'+t.id+'_'+today;   // fim do turno
+    const kReg  ='tn_reg_'+t.id+'_'+today;   // lembrete de registro
+
+    // Ignorar turno noite se a hora "fim" cruzar meia-noite e for < ini
+    // (noite pode ser 18:00-23:59, tratado normalmente)
+
+    // 1. "Seu turno vai começar" — 60 min antes do início
+    if(!ns[kPre] && cur>=t.ini-60 && cur<t.ini){
+      ns[kPre]=true;setNotifState(ns);
+      sendNotif('Meu Uber','Seu turno da '+t.nome+' vai comecar em uma hora. Prepare-se.','turno');
+    }
+
+    // 2. "Seu turno começou" — exatamente no início (janela de 5 min)
+    if(!ns[kIni] && cur>=t.ini && cur<t.ini+5){
+      ns[kIni]=true;setNotifState(ns);
+      sendNotif('Meu Uber','Seu turno da '+t.nome+' comecou agora. Bom trabalho!','turno');
+    }
+
+    // 3. "Turno quase acabando" — 60 min antes do fim
+    if(!ns[kEnd1] && cur>=t.fim-60 && cur<t.fim){
+      ns[kEnd1]=true;setNotifState(ns);
+      sendNotif('Meu Uber','Falta uma hora para o turno da '+t.nome+' acabar. Va finalizando as corridas.','turno');
+    }
+
+    // 4. "Turno acabou" — no fim (janela de 5 min)
+    if(!ns[kFim] && cur>=t.fim && cur<t.fim+5){
+      ns[kFim]=true;setNotifState(ns);
+      sendNotif('Meu Uber','Seu turno da '+t.nome+' acabou.','turno');
+    }
+
+    // 5. "Insira seus ganhos" — 10 min após o fim, se turno não foi registrado
+    if(!ns[kReg] && cur>=t.fim+10 && cur<t.fim+30){
+      const jaRegistrou=!!(data.turnos[t.id]);
+      if(!jaRegistrou){
+        ns[kReg]=true;setNotifState(ns);
+        sendNotif('Meu Uber','Insira os seus ganhos do turno da '+t.nome+' no aplicativo.','turno');
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
+// SONS
+// ══════════════════════════════════════════════════
+function getSoundOn(){return localStorage.getItem('cc_sound')!=='off'}
+function toggleSound(){
+  const on=getSoundOn();localStorage.setItem('cc_sound',on?'off':'on');
+  updateSoundBtn();showToast(on?'Sons desligados 🔇':'Sons ligados 🔊',on?'info':'ok');
+}
+function updateSoundBtn(){
+  const on=getSoundOn();
+  document.getElementById('sound-btn').textContent=on?'🔊':'🔇';
+  const cfg=document.getElementById('cfg-sound-toggle');if(cfg)cfg.textContent=on?'🔊':'🔇';
+}
+function playKeyClick(){
+  if(!getSoundOn())return;
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.setValueAtTime(1200,ctx.currentTime);g.gain.setValueAtTime(0.06,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);o.start(ctx.currentTime);o.stop(ctx.currentTime+0.05);}catch{}
+}
+function playCashRegister(){
+  if(!getSoundOn())return;
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const freqs=[880,1100,1320,1760];freqs.forEach((f,i)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.setValueAtTime(f,ctx.currentTime);g.gain.setValueAtTime(0,ctx.currentTime+i*0.06);g.gain.linearRampToValueAtTime(0.15,ctx.currentTime+i*0.06+0.01);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.06+0.12);o.start(ctx.currentTime+i*0.06);o.stop(ctx.currentTime+i*0.06+0.12);});}catch{}
+}
+
+// ══════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════
+let toastTimer=null;
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+type+' show';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300);
+}
+
+// ══════════════════════════════════════════════════
+// BACKUP
+// ══════════════════════════════════════════════════
+function exportarBackup(){
+  const bk={version:'4.0',exportedAt:new Date().toISOString(),state:getState(),config:getConfig(),gastosFixos:getGastosFixos(),abastecimentos:getAbastecimentos()};
+  const blob=new Blob([JSON.stringify(bk,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`meuuber-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);
+  showToast('Backup exportado ✅','ok');
+}
+function restaurarBackup(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{try{
+    const bk=JSON.parse(e.target.result);
+    if(!bk.state&&!bk.config)throw new Error('inválido');
+    if(!confirm(`Restaurar backup de ${bk.exportedAt?bk.exportedAt.slice(0,10):'data desconhecida'}?\nIsso substituirá todos os dados atuais.`))return;
+    if(bk.state)setState(bk.state);if(bk.config)setConfig(bk.config);
+    if(bk.gastosFixos)setGastosFixos(bk.gastosFixos);if(bk.abastecimentos)setAbastecimentos(bk.abastecimentos);
+    renderHoje();loadConfig();showToast('Backup restaurado ✅','ok');
+  }catch{showToast('Arquivo inválido','err');}};
+  reader.readAsText(file);ev.target.value='';
+}
+function exportarExcel(){
+  const state=getState();const rows=[];
+  Object.keys(state).sort().forEach(k=>{
+    const dd=state[k]||{};const g=dayTotal(dd);if(!g)return;
+    const[yr,mo,dy]=k.split('-');
+    const c=(dd.custos||{}).total||0;const desp=(dd.despesas||[]).reduce((s,d)=>s+d.val,0);
+    const lucro=g-c-desp;const h=dayHoras(dd);const km=dayKm(dd);
+    const t=dd.turnos||{};
+    const manha=t.manha?.val||0;const tarde=t.tarde?.val||0;const noite=t.noite?.val||0;
+    rows.push({data:`${dy}/${mo}/${yr}`,g,c,desp,lucro,h,km,manha,tarde,noite});
+  });
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const num=v=>parseFloat(v).toFixed(2);
+  const dH=['Data','Ganhos','Custos','Despesas','Lucro','Horas','KM','Manhã','Tarde','Noite'];
+  const dRows=rows.map(r=>`<Row><Cell><Data ss:Type="String">${esc(r.data)}</Data></Cell>`+[num(r.g),num(r.c),num(r.desp),num(r.lucro),num(r.h),num(r.km),num(r.manha),num(r.tarde),num(r.noite)].map(v=>`<Cell><Data ss:Type="Number">${v}</Data></Cell>`).join('')+'</Row>').join('');
+  const xml=`<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles><Worksheet ss:Name="Meu Uber"><Table><Row>${dH.map(h=>`<Cell ss:StyleID="h"><Data ss:Type="String">${esc(h)}</Data></Cell>`).join('')}</Row>${dRows}</Table></Worksheet></Workbook>`;
+  const blob=new Blob([xml],{type:'application/vnd.ms-excel;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`meuuber-turnos-${new Date().toISOString().slice(0,10)}.xls`;a.click();URL.revokeObjectURL(url);showToast('Excel exportado 📊','ok');
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+renderEdge();
+renderHoje();
+updateNotifBtn();
+updateSoundBtn();
+updateHeaderSub();
+// Inicia loop de notificações de turno se já tiver permissão concedida
+if('Notification'in window&&Notification.permission==='granted'){const _ns=getNotifState();if(_ns.enabled)startTurnoNotifLoop();}
+setupMask('turno-valor-input',()=>turnoCents,v=>{turnoCents=v},salvarTurno);
+setupMask('desp-val-input',()=>despCents,v=>{despCents=v});
+document.getElementById('custos-date').value=todayKey();
+</script>
+</body>
+</html>
